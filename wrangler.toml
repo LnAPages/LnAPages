@@ -1,0 +1,23 @@
+name = "fnlstg"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "dist"
+
+[[d1_databases]]
+binding = "FNLSTG_DB"
+database_name = "fnlstg"
+database_id = "04e29407-ab12-4802-8539-0791920a2980"
+migrations_dir = "migrations"
+
+[[r2_buckets]]
+binding = "FNLSTG_GALLERY"
+bucket_name = "fnlstg-gallery"
+
+[[kv_namespaces]]
+binding = "FNLSTG_CONFIG"
+id = "5e17067554924503ae5e09d4801f3d65"
+
+[vars]
+APP_URL = "https://www.fnlstage.com"
+R2_PUBLIC_BASE_URL = "https://pub-1900dc758618482397c7e1343dec2023.r2.dev"
+GITHUB_REPO_OWNER = "youre2day-eng"

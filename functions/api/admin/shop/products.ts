@@ -1,0 +1,44 @@
+import { z } from 'zod';
+import { ok, parseJson, requireAdmin } from '../../../lib/http';
+import { ensureUniqueProductSlug } from '../../../lib/products';
+import type { Env } from '../../../lib/types';
+
+const kindSchema = z.enum(['digital', 'apparel', '3d', 'shipped']);
+const createSchema = z.object({
+  slug: z.string().min(2),
+  name: z.string().min(2),
+  description: z.string().optional(),
+  price_cents: z.number().int().nonnegative(),
+  kind: kindSchema,
+  r2_key: z.string().optional(),
+  active: z.boolean().optional().default(true),
+});
+
+export const onRequestGet: PagesFunction<Env> = async (context) => {
+  await requireAdmin(context);
+  const { results } = await context.env.FNLSTG_DB.prepare(
+    'SELECT id, slug, name, description, price_cents, kind, r2_key, active, created_at FROM products ORDER BY id DESC',
+  ).all();
+  return ok(results);
+};
+
+export const onRequestPost: PagesFunction<Env> = async (context) => {
+  await requireAdmin(context);
+  const payload = await parseJson(context.request, createSchema);
+  const slug = await ensureUniqueProductSlug(context.env.FNLSTG_DB, payload.slug || payload.name);
+  const result = await context.env.FNLSTG_DB.prepare(
+    `INSERT INTO products (slug, name, description, price_cents, kind, r2_key, active)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+  )
+    .bind(
+      slug,
+      payload.name,
+      payload.description ?? null,
+      payload.price_cents,
+      payload.kind,
+      payload.r2_key ?? null,
+      payload.active ? 1 : 0,
+    )
+    .run();
+  return ok({ id: Number(result.meta.last_row_id ?? 0), ...payload, slug }, 201);
+};

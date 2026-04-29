@@ -1,0 +1,609 @@
+/* ============================================================
+   Cinema FX Pack — pure CSS + SVG-filter effects
+   All animated FX wrapped in @media (prefers-reduced-motion: no-preference)
+   Static fallbacks always visible.
+   Usage: <span class="fx-chroma" style="--fx-intensity: 60">word</span>
+   ============================================================ */
+
+/* ===== Base ===== */
+[class*='fx-'] {
+  --fx-intensity: 50;
+}
+
+/* ===== 1. DIOPTER / BOKEH ===== */
+/* fx-diopter-focus: this element stays sharp; siblings blur via parent :has() */
+.fx-diopter-focus {
+  position: relative;
+  filter: blur(0) !important;
+  transform: scale(1.01);
+  z-index: 1;
+}
+
+/* Apply a soft blur to a container that contains a .fx-diopter-focus child */
+:has(> .fx-diopter-focus) {
+  filter: blur(calc(var(--fx-intensity, 50) * 0.06px));
+}
+
+/* fx-diopter-blur: this word is soft, rest stays sharp */
+.fx-diopter-blur {
+  filter: blur(calc(var(--fx-intensity, 50) * 0.08px));
+}
+
+/* ===== 2. CHROMATIC ABERRATION ===== */
+.fx-chroma,
+.fx-chroma-pulse,
+.fx-chroma-scanline {
+  position: relative;
+  display: inline-block;
+  --_offset: calc(var(--fx-intensity, 50) * 0.04px);
+  filter:
+    drop-shadow(var(--_offset) calc(var(--_offset) * -0.25) 0 rgba(255, 30, 30, 0.85))
+    drop-shadow(calc(var(--_offset) * -1) calc(var(--_offset) * 0.25) 0 rgba(30, 30, 255, 0.85));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes fx-chroma-breathe {
+    0%, 100% { --_offset: calc(var(--fx-intensity, 50) * 0.02px); }
+    50%       { --_offset: calc(var(--fx-intensity, 50) * 0.08px); }
+  }
+
+  .fx-chroma-pulse {
+    animation: fx-chroma-breathe 3s ease-in-out infinite;
+  }
+}
+
+.fx-chroma-scanline {
+  --_offset: calc(var(--fx-intensity, 50) * 0.06px);
+}
+
+/* ===== 3. VR GLITCH BURST ===== */
+.fx-glitch-hover,
+.fx-glitch-loop,
+.fx-glitch-heavy {
+  position: relative;
+  display: inline-block;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes fx-glitch-burst {
+    0%, 100% {
+      clip-path: inset(0 0 0 0);
+      transform: translateX(0);
+      filter: none;
+    }
+    8% {
+      clip-path: inset(12% 0 38% 0);
+      transform: translateX(calc(var(--fx-intensity, 50) * -0.06px));
+      filter: drop-shadow(calc(var(--fx-intensity, 50) * 0.04px) 0 0 rgba(255, 0, 50, 0.75));
+    }
+    16% {
+      clip-path: inset(42% 0 18% 0);
+      transform: translateX(calc(var(--fx-intensity, 50) * 0.08px));
+      filter: drop-shadow(calc(var(--fx-intensity, 50) * -0.04px) 0 0 rgba(0, 80, 255, 0.75));
+    }
+    24% {
+      clip-path: inset(68% 0 8% 0);
+      transform: translateX(calc(var(--fx-intensity, 50) * -0.04px));
+      filter: none;
+    }
+    32% {
+      clip-path: inset(22% 0 52% 0);
+      transform: translateX(calc(var(--fx-intensity, 50) * 0.1px));
+      filter: drop-shadow(calc(var(--fx-intensity, 50) * 0.03px) 0 0 rgba(255, 50, 0, 0.6));
+    }
+    40% {
+      clip-path: inset(0 0 78% 0);
+      transform: translateX(calc(var(--fx-intensity, 50) * -0.07px));
+      filter: none;
+    }
+    48%, 56%, 64%, 72%, 80%, 88%, 96% {
+      clip-path: inset(0 0 0 0);
+      transform: translateX(0);
+      filter: none;
+    }
+  }
+
+  @keyframes fx-glitch-loop-trigger {
+    0%, 90%, 100% { animation-play-state: running; }
+  }
+
+  .fx-glitch-hover:hover {
+    animation: fx-glitch-burst 400ms steps(1, end) both;
+  }
+
+  .fx-glitch-loop {
+    animation: fx-glitch-burst 400ms steps(1, end) infinite;
+    animation-delay: calc(var(--fx-loop-offset, 0) * 1s);
+    /* Pause most of the time — loop by extending the duration */
+  }
+
+  /* Slow loop: burst plays once then waits. Achieved via long delay on repeat */
+  .fx-glitch-loop {
+    animation: fx-glitch-burst 400ms steps(1, end) 1;
+    animation-iteration-count: infinite;
+    animation-play-state: paused;
+  }
+  .fx-glitch-loop:not(:hover) {
+    animation: fx-glitch-burst-loop 8s steps(1, end) infinite;
+  }
+
+  @keyframes fx-glitch-burst-loop {
+    0%      { clip-path: inset(0 0 0 0); transform: none; filter: none; }
+    1%      { clip-path: inset(12% 0 38% 0); transform: translateX(calc(var(--fx-intensity, 50) * -0.06px)); filter: drop-shadow(calc(var(--fx-intensity, 50) * 0.04px) 0 0 rgba(255, 0, 50, 0.75)); }
+    2%      { clip-path: inset(42% 0 18% 0); transform: translateX(calc(var(--fx-intensity, 50) * 0.08px)); filter: drop-shadow(calc(var(--fx-intensity, 50) * -0.04px) 0 0 rgba(0, 80, 255, 0.75)); }
+    3%      { clip-path: inset(68% 0 8% 0); transform: translateX(calc(var(--fx-intensity, 50) * -0.04px)); filter: none; }
+    4%      { clip-path: inset(22% 0 52% 0); transform: translateX(calc(var(--fx-intensity, 50) * 0.1px)); filter: drop-shadow(calc(var(--fx-intensity, 50) * 0.03px) 0 0 rgba(255, 50, 0, 0.6)); }
+    5%      { clip-path: inset(0 0 78% 0); transform: translateX(calc(var(--fx-intensity, 50) * -0.07px)); filter: none; }
+    6%, 100% { clip-path: inset(0 0 0 0); transform: none; filter: none; }
+  }
+
+  .fx-glitch-heavy {
+    animation: fx-glitch-micro 1.2s steps(1, end) infinite;
+  }
+
+  @keyframes fx-glitch-micro {
+    0%, 85%, 100% { clip-path: inset(0 0 0 0); transform: none; filter: none; }
+    86%  { clip-path: inset(5% 0 70% 0);  transform: translateX(calc(var(--fx-intensity, 50) * -0.05px)); filter: drop-shadow(2px 0 0 rgba(255, 0, 50, 0.6)); }
+    87%  { clip-path: inset(30% 0 40% 0); transform: translateX(calc(var(--fx-intensity, 50) * 0.07px));  filter: none; }
+    88%  { clip-path: inset(60% 0 15% 0); transform: translateX(calc(var(--fx-intensity, 50) * -0.06px)); filter: drop-shadow(-2px 0 0 rgba(0, 80, 255, 0.6)); }
+    89%  { clip-path: inset(80% 0 5% 0);  transform: translateX(calc(var(--fx-intensity, 50) * 0.04px));  filter: none; }
+    90%  { clip-path: inset(45% 0 30% 0); transform: none; filter: drop-shadow(3px 0 0 rgba(255, 50, 0, 0.5)); }
+    91%  { clip-path: inset(0 0 0 0);     transform: none; filter: none; }
+  }
+}
+
+/* ===== 4. SCANLINE SHEAR ===== */
+/* Soft static shear — no SVG filter required for the soft variant */
+.fx-shear-soft {
+  display: inline-block;
+  filter: url(#fx-shear-soft);
+  transform: skewX(calc(var(--fx-intensity, 50) * -0.006deg));
+}
+
+.fx-shear-glitch {
+  display: inline-block;
+  filter: url(#fx-shear-glitch);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes fx-shear-tick {
+    0%, 100% { transform: skewX(0deg); }
+    12%  { transform: skewX(calc(var(--fx-intensity, 50) * -0.02deg)); }
+    25%  { transform: skewX(calc(var(--fx-intensity, 50) * 0.03deg)); }
+    37%  { transform: skewX(0deg); }
+    50%  { transform: skewX(calc(var(--fx-intensity, 50) * -0.01deg)); }
+    62%  { transform: skewX(calc(var(--fx-intensity, 50) * 0.015deg)); }
+    75%  { transform: skewX(0deg); }
+  }
+
+  .fx-shear-glitch {
+    animation: fx-shear-tick 0.8s steps(3, end) infinite;
+  }
+}
+
+/* ===== 5. DEPTH-OF-FIELD FOCUS PULL ===== */
+.fx-focus-pull {
+  display: inline-block;
+  position: relative;
+  filter: blur(calc(var(--fx-depth, 0.5) * var(--fx-intensity, 50) * 0.02px));
+  transform: scale(calc(1 + var(--fx-depth, 0.5) * 0.01)) translateZ(0);
+  opacity: calc(1 - var(--fx-depth, 0.5) * 0.08);
+}
+
+/* Per-letter depth — use nth-of-type + CSS vars on each letter span */
+.fx-focus-pull-scroll {
+  display: inline-block;
+  filter: blur(calc(var(--fx-scroll-blur, 0) * 1px));
+  transition: filter 200ms ease;
+}
+
+/* ===== 6. HOLOGRAPHIC IRIDESCENCE ===== */
+.fx-holo {
+  display: inline-block;
+  background: conic-gradient(
+    from 0deg,
+    hsl(0   100% 65%),
+    hsl(60  100% 65%),
+    hsl(120 100% 65%),
+    hsl(180 100% 65%),
+    hsl(240 100% 65%),
+    hsl(300 100% 65%),
+    hsl(360 100% 65%)
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  background-size: 200% 200%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes fx-holo-spin {
+    from { filter: hue-rotate(0deg) saturate(1.4); }
+    to   { filter: hue-rotate(360deg) saturate(1.4); }
+  }
+  .fx-holo {
+    animation: fx-holo-spin 6s linear infinite;
+  }
+}
+
+.fx-holo-prism {
+  display: inline-block;
+  background: linear-gradient(
+    105deg,
+    hsl(0   90% 60%) 0%,
+    hsl(60  90% 60%) 20%,
+    hsl(120 90% 60%) 40%,
+    hsl(200 90% 60%) 60%,
+    hsl(270 90% 60%) 80%,
+    hsl(330 90% 60%) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  --_offset: calc(var(--fx-intensity, 50) * 0.02px);
+  filter:
+    drop-shadow(var(--_offset) 0 0 rgba(255, 0, 80, 0.45))
+    drop-shadow(calc(var(--_offset) * -1) 0 0 rgba(0, 60, 255, 0.45));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes fx-holo-prism-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50%       { background-position: 100% 50%; }
+  }
+  .fx-holo-prism {
+    background-size: 200% 100%;
+    animation: fx-holo-prism-shift 4s ease-in-out infinite;
+  }
+}
+
+.fx-holo-foil {
+  display: inline-block;
+  background: linear-gradient(
+    120deg,
+    hsl(220 25% 75%) 0%,
+    hsl(240 30% 88%) 20%,
+    hsl(200 18% 70%) 40%,
+    hsl(180 22% 82%) 60%,
+    hsl(210 28% 72%) 80%,
+    hsl(230 20% 80%) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  background-size: 200% 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes fx-foil-shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50%       { background-position: 100% 50%; }
+  }
+  .fx-holo-foil {
+    animation: fx-foil-shimmer 5s ease-in-out infinite;
+  }
+}
+
+/* ===== 7. MOTION-TRAIL ECHO ===== */
+.fx-echo-trail {
+  display: inline-block;
+  --_o: calc(var(--fx-intensity, 50) * 0.05px);
+  text-shadow:
+    calc(var(--_o) * 1) calc(var(--_o) * 0.5) 2px hsl(var(--accent) / 0.38),
+    calc(var(--_o) * 2) calc(var(--_o) * 1)   3px hsl(var(--accent) / 0.22),
+    calc(var(--_o) * 3) calc(var(--_o) * 1.5) 5px hsl(var(--accent) / 0.12),
+    calc(var(--_o) * 4) calc(var(--_o) * 2)   8px hsl(var(--accent) / 0.05);
+}
+
+.fx-echo-phantom {
+  display: inline-block;
+  position: relative;
+  --_o: calc(var(--fx-intensity, 50) * 0.04px);
+  text-shadow:
+    calc(var(--_o) * -1) calc(var(--_o) * -0.5) 0 hsl(var(--foreground) / 0.25),
+    calc(var(--_o) * 2)  calc(var(--_o) * 1)    0 hsl(var(--accent) / 0.20),
+    calc(var(--_o) * -3) calc(var(--_o) * 1.5)  0 hsl(var(--foreground) / 0.12);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes fx-phantom-drift {
+    0%, 100% { text-shadow-offset: 0; }
+    50% {
+      text-shadow:
+        calc(var(--_o, 2px) * -2) calc(var(--_o, 2px) * -1)   0 hsl(var(--foreground) / 0.20),
+        calc(var(--_o, 2px) * 4)  calc(var(--_o, 2px) * 2)    0 hsl(var(--accent) / 0.18),
+        calc(var(--_o, 2px) * -6) calc(var(--_o, 2px) * 3)    0 hsl(var(--foreground) / 0.10);
+    }
+  }
+  .fx-echo-phantom:hover {
+    animation: fx-phantom-drift 1.2s ease-in-out;
+  }
+}
+
+.fx-echo-parallax {
+  display: inline-block;
+  --_o: calc(var(--fx-intensity, 50) * 0.06px);
+  text-shadow:
+    calc(var(--_o) * 1.5) calc(var(--_o) * 0.8) 3px hsl(var(--accent) / 0.28),
+    calc(var(--_o) * 3)   calc(var(--_o) * 1.5) 5px hsl(var(--foreground) / 0.15),
+    calc(var(--_o) * -1)  calc(var(--_o) * -0.5) 2px hsl(var(--accent) / 0.18);
+}
+
+/* ===== 8. SIGNAL-LOSS SNOW ===== */
+.fx-snow,
+.fx-snow-heavy {
+  position: relative;
+  display: inline-block;
+}
+
+/* Snow overlay via ::after with SVG noise filter */
+.fx-snow::after,
+.fx-snow-heavy::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  mix-blend-mode: overlay;
+  opacity: calc(var(--fx-intensity, 50) * 0.003);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='sn'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23sn)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+.fx-snow-heavy::after {
+  opacity: calc(var(--fx-intensity, 50) * 0.008);
+  mix-blend-mode: hard-light;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes fx-snow-shift {
+    0%   { background-position: 0 0; }
+    25%  { background-position: -30px 20px; }
+    50%  { background-position: 20px -40px; }
+    75%  { background-position: -10px 30px; }
+    100% { background-position: 0 0; }
+  }
+  .fx-snow::after       { animation: fx-snow-shift 0.12s steps(1, end) infinite; }
+  .fx-snow-heavy::after { animation: fx-snow-shift 0.08s steps(1, end) infinite; }
+}
+
+/* ===== 9. HEX-DITHER PIXELATION ===== */
+.fx-dither-mosaic {
+  display: inline-block;
+  filter: url(#fx-dither-mosaic) blur(0);
+  image-rendering: pixelated;
+}
+
+.fx-dither-dissolve {
+  display: inline-block;
+  filter: none;
+  transition: filter 400ms ease;
+}
+
+.fx-dither-dissolve:hover {
+  filter: url(#fx-dither-mosaic);
+}
+
+.fx-dither-rebuild {
+  display: inline-block;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes fx-dither-build {
+    0%   { filter: url(#fx-dither-mosaic); }
+    100% { filter: none; }
+  }
+  .fx-dither-rebuild {
+    animation: fx-dither-build 1.5s ease-out forwards;
+  }
+}
+
+/* ===== 10. PRESET COMBOS ===== */
+/* fx-vr-corrupt = fx-chroma-scanline + fx-glitch-loop + fx-snow */
+.fx-vr-corrupt {
+  position: relative;
+  display: inline-block;
+  --_offset: calc(var(--fx-intensity, 50) * 0.06px);
+  filter:
+    drop-shadow(var(--_offset) 0 0 rgba(255, 30, 30, 0.85))
+    drop-shadow(calc(var(--_offset) * -1) 0 0 rgba(30, 30, 255, 0.85));
+}
+.fx-vr-corrupt::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  opacity: calc(var(--fx-intensity, 50) * 0.005);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='sn'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23sn)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .fx-vr-corrupt {
+    animation: fx-glitch-burst-loop 8s steps(1, end) infinite;
+  }
+  .fx-vr-corrupt::after {
+    animation: fx-snow-shift 0.1s steps(1, end) infinite;
+  }
+}
+
+/* fx-tape-decay = fx-shear-soft + fx-snow + fx-echo-trail */
+.fx-tape-decay {
+  display: inline-block;
+  position: relative;
+  transform: skewX(calc(var(--fx-intensity, 50) * -0.006deg));
+  --_o: calc(var(--fx-intensity, 50) * 0.05px);
+  text-shadow:
+    calc(var(--_o) * 1) calc(var(--_o) * 0.5) 2px hsl(var(--accent) / 0.32),
+    calc(var(--_o) * 2) calc(var(--_o) * 1)   3px hsl(var(--accent) / 0.18),
+    calc(var(--_o) * 3) calc(var(--_o) * 1.5) 5px hsl(var(--accent) / 0.08);
+}
+.fx-tape-decay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  opacity: calc(var(--fx-intensity, 50) * 0.004);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='sn'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23sn)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+/* fx-holo-glitch = fx-holo-prism + fx-chroma-pulse + fx-glitch-hover */
+.fx-holo-glitch {
+  display: inline-block;
+  position: relative;
+  background: linear-gradient(
+    105deg,
+    hsl(0   90% 60%) 0%,
+    hsl(60  90% 60%) 20%,
+    hsl(120 90% 60%) 40%,
+    hsl(200 90% 60%) 60%,
+    hsl(270 90% 60%) 80%,
+    hsl(330 90% 60%) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .fx-holo-glitch {
+    animation: fx-holo-prism-shift 4s ease-in-out infinite;
+    background-size: 200% 100%;
+  }
+  .fx-holo-glitch:hover {
+    animation: fx-holo-prism-shift 4s ease-in-out infinite, fx-glitch-burst 400ms steps(1, end) both;
+  }
+}
+
+/* fx-cinema-bokeh = fx-diopter-focus + fx-focus-pull + subtle echo */
+.fx-cinema-bokeh {
+  position: relative;
+  filter: blur(0);
+  transform: scale(1.01);
+  z-index: 1;
+  --_o: calc(var(--fx-intensity, 50) * 0.03px);
+  text-shadow:
+    calc(var(--_o) * 1) calc(var(--_o) * 0.5) 2px hsl(var(--accent) / 0.28),
+    calc(var(--_o) * 2) calc(var(--_o) * 1)   4px hsl(var(--accent) / 0.14);
+}
+
+/* fx-dead-signal = fx-snow-heavy + fx-shear-glitch + fx-chroma */
+.fx-dead-signal {
+  display: inline-block;
+  position: relative;
+  --_offset: calc(var(--fx-intensity, 50) * 0.06px);
+  filter:
+    url(#fx-shear-glitch)
+    drop-shadow(var(--_offset) 0 0 rgba(255, 30, 30, 0.85))
+    drop-shadow(calc(var(--_offset) * -1) 0 0 rgba(30, 30, 255, 0.85));
+}
+.fx-dead-signal::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: hard-light;
+  opacity: calc(var(--fx-intensity, 50) * 0.008);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='sn'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23sn)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .fx-dead-signal {
+    animation: fx-shear-tick 0.8s steps(3, end) infinite;
+  }
+  .fx-dead-signal::after {
+    animation: fx-snow-shift 0.08s steps(1, end) infinite;
+  }
+}
+
+/* ===== HOVER-DIP CARDS PRESET ===== */
+/* Applied to the card grid wrapper */
+.fx-hover-dip-grid {
+  perspective: 1200px;
+  transform-style: preserve-3d;
+}
+
+/* Cards in a 3-column grid dip from the center */
+.fx-hover-dip-grid .card-interactive:nth-child(3n+1) {
+  --_dip-rotate-y: 1.5deg;
+}
+.fx-hover-dip-grid .card-interactive:nth-child(3n+2) {
+  --_dip-rotate-y: -1.5deg;
+}
+.fx-hover-dip-grid .card-interactive:nth-child(3n+3) {
+  --_dip-rotate-y: 1deg;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fx-hover-dip-grid .card-interactive {
+    transition: transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 280ms ease;
+    transform-origin: center bottom;
+  }
+  .fx-hover-dip-grid .card-interactive:hover {
+    transform:
+      translateY(-6px)
+      rotateY(var(--_dip-rotate-y, 0deg))
+      rotateX(1.5deg);
+    box-shadow: var(--shadow-lift);
+  }
+}
+
+/* ===== REDUCED MOTION OVERRIDES ===== */
+@media (prefers-reduced-motion: reduce) {
+  /* Static versions of all animated FX */
+  .fx-glitch-hover,
+  .fx-glitch-loop,
+  .fx-glitch-heavy,
+  .fx-vr-corrupt {
+    animation: none !important;
+    clip-path: none !important;
+    transform: none !important;
+  }
+
+  .fx-chroma-pulse { animation: none !important; }
+  .fx-shear-glitch  { animation: none !important; transform: skewX(0.5deg); }
+  .fx-holo          { animation: none !important; }
+  .fx-holo-prism    { animation: none !important; }
+  .fx-holo-foil     { animation: none !important; }
+  .fx-snow::after,
+  .fx-snow-heavy::after,
+  .fx-vr-corrupt::after,
+  .fx-tape-decay::after,
+  .fx-dead-signal::after { animation: none !important; }
+
+  /* Keep static iridescence */
+  .fx-holo {
+    background: linear-gradient(90deg, hsl(0 80% 65%), hsl(120 80% 65%), hsl(240 80% 65%));
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+
+  .fx-hover-dip-grid .card-interactive {
+    transform: none !important;
+  }
+}
+
+/* ===== HIGH CONTRAST OVERRIDES ===== */
+@media (prefers-contrast: more) {
+  [class*='fx-'] {
+    --fx-intensity: 20;
+  }
+  .fx-chroma,
+  .fx-chroma-pulse,
+  .fx-chroma-scanline,
+  .fx-vr-corrupt,
+  .fx-dead-signal {
+    filter: none;
+  }
+  .fx-holo,
+  .fx-holo-prism,
+  .fx-holo-foil,
+  .fx-holo-glitch {
+    background: none;
+    -webkit-background-clip: initial;
+    background-clip: initial;
+    color: inherit;
+  }
+}
