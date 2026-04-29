@@ -1,23 +1,23 @@
-name = "fnlstg"
+name = "lnapages"
 compatibility_date = "2025-01-01"
 compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = "dist"
 
 [[d1_databases]]
-binding = "FNLSTG_DB"
-database_name = "fnlstg"
-database_id = "04e29407-ab12-4802-8539-0791920a2980"
+binding = "LNAPAGES_DB"
+database_name = "lnapages"
+database_id = "eedabc12-72b4-477a-a8fe-d8df7aaa9957"
 migrations_dir = "migrations"
 
 [[r2_buckets]]
-binding = "FNLSTG_GALLERY"
-bucket_name = "fnlstg-gallery"
+binding = "LNAPAGES_GALLERY"
+bucket_name = "lnapages-gallery"
 
 [[kv_namespaces]]
-binding = "FNLSTG_CONFIG"
-id = "5e17067554924503ae5e09d4801f3d65"
+binding = "LNAPAGES_CONFIG"
+id = "e776936711fe4c91a9e31a89534732de"
 
 [vars]
-APP_URL = "https://www.fnlstage.com"
-R2_PUBLIC_BASE_URL = "https://pub-1900dc758618482397c7e1343dec2023.r2.dev"
-GITHUB_REPO_OWNER = "youre2day-eng"
+APP_URL = ""
+R2_PUBLIC_BASE_URL = ""
+GITHUB_REPO_OWNER = "LnAPages"
