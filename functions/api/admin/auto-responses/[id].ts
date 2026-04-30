@@ -20,7 +20,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   const id = Number(context.params['id']);
   if (!id) throw new HttpError(400, 'BAD_REQUEST', 'Invalid id');
 
-  const row = await context.env.FNLSTG_DB
+  const row = await context.env.LNAPAGES_DB
     .prepare(`SELECT * FROM auto_response_templates WHERE id = ?`)
     .bind(id)
     .first();
@@ -62,9 +62,9 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
   }
   binds.push(id);
 
-  await env.FNLSTG_DB.prepare(`UPDATE auto_response_templates SET ${setClauses.join(', ')} WHERE id = ?`).bind(...binds).run();
+  await env.LNAPAGES_DB.prepare(`UPDATE auto_response_templates SET ${setClauses.join(', ')} WHERE id = ?`).bind(...binds).run();
 
-  await writeAuditLog(env.FNLSTG_DB, 'auto_response.update', {
+  await writeAuditLog(env.LNAPAGES_DB, 'auto_response.update', {
     userId: user.id,
     resourceType: 'auto_response_template',
     resourceId: String(id),
@@ -83,9 +83,9 @@ export const onRequestDelete: PagesFunction<Env> = async (context) => {
   const id = Number(context.params['id']);
   if (!id) throw new HttpError(400, 'BAD_REQUEST', 'Invalid id');
 
-  await env.FNLSTG_DB.prepare(`DELETE FROM auto_response_templates WHERE id = ?`).bind(id).run();
+  await env.LNAPAGES_DB.prepare(`DELETE FROM auto_response_templates WHERE id = ?`).bind(id).run();
 
-  await writeAuditLog(env.FNLSTG_DB, 'auto_response.delete', {
+  await writeAuditLog(env.LNAPAGES_DB, 'auto_response.delete', {
     userId: user.id,
     resourceType: 'auto_response_template',
     resourceId: String(id),
