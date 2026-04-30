@@ -22,7 +22,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   const { results } = await context.env.FNLSTG_DB.prepare(
     'SELECT tag FROM product_tags WHERE product_id = ? ORDER BY tag COLLATE NOCASE ASC',
   ).bind(id).all<{ tag: string }>();
-  return ok({ tags: (results ?? []).map((row) => row.tag) });
+  return ok({ tags: (results ?? []).map((row: { tag: string }) => row.tag) });
 };
 
 export const onRequestPut: PagesFunction<Env> = async (context) => {
