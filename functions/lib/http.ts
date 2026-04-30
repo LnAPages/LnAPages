@@ -73,10 +73,10 @@ async function loadPermissions(db: D1Database, userId: number): Promise<string[]
 }
 
 export async function getAdminUser(context: EventContext<Env, string, unknown>): Promise<AdminUser | null> {
-  const db = context.env.FNLSTG_DB;
+  const db = context.env.LNAPAGES_DB;
 
-  // ── New HMAC-signed session (fnlstg_session cookie) ─────────────────────
-  const newCookie = readCookie(context.request, 'fnlstg_session');
+  // ── New HMAC-signed session (LNAPAGES_session cookie) ─────────────────────
+  const newCookie = readCookie(context.request, 'LNAPAGES_session');
   if (newCookie && context.env.SESSION_SECRET) {
     const rawToken = await verifySessionToken(newCookie, context.env.SESSION_SECRET);
     if (rawToken) {
