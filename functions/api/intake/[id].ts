@@ -9,7 +9,7 @@ export const onRequestPatch: PagesFunction<Env> = async (context) => {
   await requireAdmin(context);
   const id = idSchema.parse(context.params.id);
   const payload = await parseJson(context.request, intakeUpdateSchema);
-  await context.env.FNLSTG_DB.prepare(
+  await context.env.LNAPAGES_DB.prepare(
     `UPDATE intakes
      SET name = COALESCE(?, name), email = COALESCE(?, email), phone = COALESCE(?, phone),
          project_type = COALESCE(?, project_type), message = COALESCE(?, message), status = COALESCE(?, status)
