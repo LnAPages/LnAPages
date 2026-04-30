@@ -9,13 +9,13 @@ export const noStoreHeaders: HeadersInit = {
 };
 
 export async function getServicesVersion(env: Env): Promise<string> {
-  const kvVersion = await env.FNLSTG_CONFIG.get(SERVICES_INDEX_VERSION_KEY);
+  const kvVersion = await env.LNAPAGES_CONFIG.get(SERVICES_INDEX_VERSION_KEY);
   if (kvVersion) return kvVersion;
   return '0';
 }
 
 export async function touchServicesVersion(env: Env): Promise<string> {
   const version = `${Date.now()}-${crypto.randomUUID()}`;
-  await env.FNLSTG_CONFIG.put(SERVICES_INDEX_VERSION_KEY, version);
+  await env.LNAPAGES_CONFIG.put(SERVICES_INDEX_VERSION_KEY, version);
   return version;
 }
