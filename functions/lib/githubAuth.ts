@@ -19,7 +19,7 @@ export function normalizeUsernames(usernames: string[]): string[] {
 }
 
 export async function getAdditionalAdmins(env: Env): Promise<string[]> {
-  const raw = await env.FNLSTG_CONFIG.get(ADMIN_GITHUB_USERNAMES_KEY, 'json');
+  const raw = await env.LNAPAGES_CONFIG.get(ADMIN_GITHUB_USERNAMES_KEY, 'json');
   if (!Array.isArray(raw)) return [];
   return normalizeUsernames(raw.filter((item): item is string => typeof item === 'string'));
 }
