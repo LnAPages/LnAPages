@@ -22,7 +22,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
     return fail(400, 'BAD_REQUEST', error instanceof Error ? error.message : 'Invalid payload');
   }
 
-  const result = await env.FNLSTG_DB.prepare(
+  const result = await env.LNAPAGES_DB.prepare(
     `INSERT INTO inquiries (service_id, date, time, name, email, phone, notes, created_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
   )
