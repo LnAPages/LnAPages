@@ -1,5 +1,5 @@
 {
-  "name": "fnlstg",
+  "name": "lnapages",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -8,9 +8,9 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "deploy": "npm run build && wrangler pages deploy dist",
-    "db:migrate": "wrangler d1 migrations apply fnlstg --local",
-    "db:migrate:remote": "wrangler d1 migrations apply fnlstg --remote",
-    "db:seed": "wrangler d1 execute fnlstg --local --file ./migrations/0002_seed.sql",
+    "db:migrate": "wrangler d1 migrations apply lnapages --local",
+    "db:migrate:remote": "wrangler d1 migrations apply lnapages --remote",
+    "db:seed": "wrangler d1 execute lnapages --local --file ./migrations/0002_seed.sql",
     "typecheck": "tsc --noEmit",
     "lint": "eslint ."
   },
