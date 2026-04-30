@@ -19,5 +19,5 @@ id = "e776936711fe4c91a9e31a89534732de"
 
 [vars]
 APP_URL = "https://lnapages.pages.dev"
-R2_PUBLIC_BASE_URL = ""
+R2_PUBLIC_BASE_URL = "https://pub-5867157fecae45cd9f83f7f4543499ad.r2.dev"
 GITHUB_REPO_OWNER = "LnAPages"
