@@ -28,7 +28,7 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
   const body = await parseJson(request, schema);
 
   const stmts = body.permissions.map((p) =>
-    env.FNLSTG_DB.prepare(
+    env.LNAPAGES_DB.prepare(
       `INSERT INTO admin_panel_permissions (user_id, panel_key, can_view, can_edit, updated_at)
        VALUES (?, ?, ?, ?, datetime('now'))
        ON CONFLICT(user_id, panel_key) DO UPDATE SET
@@ -39,10 +39,10 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
   );
 
   if (stmts.length > 0) {
-    await env.FNLSTG_DB.batch(stmts);
+    await env.LNAPAGES_DB.batch(stmts);
   }
 
-  await writeAuditLog(env.FNLSTG_DB, 'employee.permissions_updated', {
+  await writeAuditLog(env.LNAPAGES_DB, 'employee.permissions_updated', {
     userId: user.id,
     resourceType: 'admin_user',
     resourceId: String(targetId),
