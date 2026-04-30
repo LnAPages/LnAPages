@@ -31,7 +31,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
   const r2BaseUrl = context.env.R2_PUBLIC_BASE_URL ?? '';
 
-  const row = await context.env.FNLSTG_DB
+  const row = await context.env.LNAPAGES_DB
     .prepare(
       `SELECT gi.*,
               COALESCE(
