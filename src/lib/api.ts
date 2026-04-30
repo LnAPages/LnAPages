@@ -5,7 +5,7 @@ export type ApiResponse<T> = ApiSuccess<T> | ApiFailure;
 
 function getCsrfToken(): string {
   if (typeof document === 'undefined') return '';
-  const match = document.cookie.split(';').map(c => c.trim()).find(c => c.startsWith('fnlstg_csrf='));
+  const match = document.cookie.split(';').map(c => c.trim()).find(c => c.startsWith('LNAPAGES_csrf='));
   return match ? decodeURIComponent(match.split('=').slice(1).join('=')) : '';
 }
 
