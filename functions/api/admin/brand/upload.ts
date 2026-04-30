@@ -45,7 +45,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   const contentType = normalizeMimeType(typeof filePart.type === 'string' ? filePart.type : null);
   const bytes = new Uint8Array(await filePart.arrayBuffer());
 
-  const mediaBucket = context.env.FNLSTG_GALLERY;
+  const mediaBucket = context.env.LNAPAGES_GALLERY;
   if (mediaBucket && typeof mediaBucket.put === 'function') {
     await mediaBucket.put(key, bytes, { httpMetadata: { contentType } });
 
@@ -61,12 +61,12 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   }
 
   if (bytes.length > MAX_KV_UPLOAD_BYTES) {
-    return fail(400, 'UPLOAD_TOO_LARGE', 'File exceeds 200KB fallback size limit without FNLSTG_MEDIA binding');
+    return fail(400, 'UPLOAD_TOO_LARGE', 'File exceeds 200KB fallback size limit without LNAPAGES_MEDIA binding');
   }
 
   const dataUrl = `data:${contentType};base64,${toBase64(bytes)}`;
   const kvKey = `brand_media:${Date.now()}-${crypto.randomUUID()}.${ext}`;
-  await context.env.FNLSTG_CONFIG.put(
+  await context.env.LNAPAGES_CONFIG.put(
     kvKey,
     JSON.stringify({
       key,
