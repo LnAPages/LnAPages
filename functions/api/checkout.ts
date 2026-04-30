@@ -57,7 +57,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
     return fail(500, 'MISCONFIGURED', 'Stripe is not configured on this environment');
   }
 
-  const item = await env.FNLSTG_DB.prepare(
+  const item = await env.LNAPAGES_DB.prepare(
     `SELECT id, name, billing_mode, duration_minutes, price_cents, active
      FROM items WHERE id = ? AND type IN ('service','bundle')`,
   )
@@ -76,7 +76,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
   const startTime = toIsoStart(payload.date, payload.time);
   const endTime = addMinutes(startTime, item.duration_minutes ?? 60);
 
-  const insert = await env.FNLSTG_DB.prepare(
+  const insert = await env.LNAPAGES_DB.prepare(
     `INSERT INTO bookings (
       item_id, customer_name, customer_email, customer_phone,
       start_time, end_time, hours_requested, addon_item_ids,
@@ -128,7 +128,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
     },
   });
 
-  await env.FNLSTG_DB.prepare(
+  await env.LNAPAGES_DB.prepare(
     'UPDATE bookings SET stripe_session_id = ?, updated_at = datetime(\'now\') WHERE id = ?',
   )
     .bind(session.id, bookingId)
