@@ -14,7 +14,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
   if (!(await isShopEnabled(env))) {
     return fail(404, 'NOT_FOUND', 'Shop is disabled');
   }
-  const { results } = await env.FNLSTG_DB.prepare(
+  const { results } = await env.LNAPAGES_DB.prepare(
     `SELECT p.id,
             p.slug,
             p.name,
