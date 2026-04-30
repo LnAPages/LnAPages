@@ -52,22 +52,22 @@ function parseOrDefault<T>(raw: unknown, schema: { safeParse: (value: unknown) =
 }
 
 export async function readBrandIdentity(env: Env): Promise<BrandIdentity> {
-  const raw = await env.FNLSTG_CONFIG.get(BRAND_IDENTITY_KV_KEY, 'json');
+  const raw = await env.LNAPAGES_CONFIG.get(BRAND_IDENTITY_KV_KEY, 'json');
   return parseOrDefault(raw, brandIdentitySchema, brandIdentitySchema.parse({}));
 }
 
 export async function readBrandContact(env: Env): Promise<BrandContact> {
-  const raw = await env.FNLSTG_CONFIG.get(BRAND_CONTACT_KV_KEY, 'json');
+  const raw = await env.LNAPAGES_CONFIG.get(BRAND_CONTACT_KV_KEY, 'json');
   return parseOrDefault(raw, brandContactSchema, brandContactSchema.parse({}));
 }
 
 export async function readBrandSocial(env: Env): Promise<BrandSocial> {
-  const raw = await env.FNLSTG_CONFIG.get(BRAND_SOCIAL_KV_KEY, 'json');
+  const raw = await env.LNAPAGES_CONFIG.get(BRAND_SOCIAL_KV_KEY, 'json');
   return parseOrDefault(raw, brandSocialSchema, brandSocialSchema.parse({}));
 }
 
 export async function readBrandLegal(env: Env): Promise<BrandLegal> {
-  const raw = await env.FNLSTG_CONFIG.get(BRAND_LEGAL_KV_KEY, 'json');
+  const raw = await env.LNAPAGES_CONFIG.get(BRAND_LEGAL_KV_KEY, 'json');
   return parseOrDefault(raw, brandLegalSchema, brandLegalSchema.parse({}));
 }
 
@@ -86,12 +86,12 @@ export function toBrandPublic(brand: BrandAdmin): BrandPublic {
 }
 
 export async function bustBrandPublicCache(env: Env): Promise<void> {
-  await env.FNLSTG_CONFIG.delete(BRAND_PUBLIC_CACHE_KEY);
+  await env.LNAPAGES_CONFIG.delete(BRAND_PUBLIC_CACHE_KEY);
 }
 
 export async function upsertBrandIdentity(env: Env, payload: BrandIdentityInput): Promise<BrandIdentity> {
   const next = brandIdentitySchema.parse({ ...brandIdentityInputSchema.parse(payload), updated_at: nowIso() });
-  await env.FNLSTG_CONFIG.put(BRAND_IDENTITY_KV_KEY, JSON.stringify(next));
+  await env.LNAPAGES_CONFIG.put(BRAND_IDENTITY_KV_KEY, JSON.stringify(next));
   await bustBrandPublicCache(env);
   return next;
 }
@@ -120,7 +120,7 @@ export async function upsertBrandContact(env: Env, payload: BrandContactInput): 
     phone_e164: toE164(parsed.phone),
     updated_at: nowIso(),
   });
-  await env.FNLSTG_CONFIG.put(BRAND_CONTACT_KV_KEY, JSON.stringify(next));
+  await env.LNAPAGES_CONFIG.put(BRAND_CONTACT_KV_KEY, JSON.stringify(next));
   await bustBrandPublicCache(env);
   return next;
 }
@@ -151,14 +151,14 @@ export function normalizeBrandSocial(payload: BrandSocialInput): BrandSocialInpu
 export async function upsertBrandSocial(env: Env, payload: BrandSocialInput): Promise<BrandSocial> {
   const normalized = normalizeBrandSocial(brandSocialInputSchema.parse(payload));
   const next = brandSocialSchema.parse({ ...normalized, updated_at: nowIso() });
-  await env.FNLSTG_CONFIG.put(BRAND_SOCIAL_KV_KEY, JSON.stringify(next));
+  await env.LNAPAGES_CONFIG.put(BRAND_SOCIAL_KV_KEY, JSON.stringify(next));
   await bustBrandPublicCache(env);
   return next;
 }
 
 export async function upsertBrandLegal(env: Env, payload: BrandLegalInput): Promise<BrandLegal> {
   const next = brandLegalSchema.parse(brandLegalInputSchema.parse(payload));
-  await env.FNLSTG_CONFIG.put(BRAND_LEGAL_KV_KEY, JSON.stringify(next));
+  await env.LNAPAGES_CONFIG.put(BRAND_LEGAL_KV_KEY, JSON.stringify(next));
   await bustBrandPublicCache(env);
   return next;
 }
