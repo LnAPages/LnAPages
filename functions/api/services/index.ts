@@ -28,24 +28,24 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   let results: Array<Record<string, unknown>>;
   try {
     const sql = `SELECT ${CATEGORY_SERVICE_COLUMNS} FROM items ${where} ORDER BY sort_order, id`;
-    const query = await env.FNLSTG_DB.prepare(sql).all<Record<string, unknown>>();
+    const query = await env.LNAPAGES_DB.prepare(sql).all<Record<string, unknown>>();
     results = query.results;
   } catch (error) {
     if (isMissingCategoryColumnError(error)) {
       const fallbackSql = `SELECT ${BASE_SERVICE_COLUMNS} FROM items ${where} ORDER BY sort_order, id`;
-      const query = await env.FNLSTG_DB.prepare(fallbackSql).all<Record<string, unknown>>();
+      const query = await env.LNAPAGES_DB.prepare(fallbackSql).all<Record<string, unknown>>();
       results = withDerivedServiceCategory(query.results);
     } else if (isMissingTableError(error, 'items')) {
       const legacyWhereWithType = buildServicesWhere(includeAll);
       try {
         const legacySql = `SELECT ${BASE_SERVICE_COLUMNS} FROM services ${legacyWhereWithType} ORDER BY sort_order, id`;
-        const query = await env.FNLSTG_DB.prepare(legacySql).all<Record<string, unknown>>();
+        const query = await env.LNAPAGES_DB.prepare(legacySql).all<Record<string, unknown>>();
         results = withDerivedServiceCategory(query.results);
       } catch (legacyError) {
         if (!isMissingColumnError(legacyError, 'type')) throw legacyError;
         const legacyWhere = includeAll ? '' : 'WHERE active = 1';
         const legacySql = `SELECT ${BASE_SERVICE_COLUMNS} FROM services ${legacyWhere} ORDER BY sort_order, id`;
-        const query = await env.FNLSTG_DB.prepare(legacySql).all<Record<string, unknown>>();
+        const query = await env.LNAPAGES_DB.prepare(legacySql).all<Record<string, unknown>>();
         results = withDerivedServiceCategory(query.results);
       }
     } else {
@@ -61,7 +61,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   const payload = await parseJson(context.request, serviceCreateSchema);
   let result;
   try {
-    result = await context.env.FNLSTG_DB.prepare(
+    result = await context.env.LNAPAGES_DB.prepare(
       `INSERT INTO items (type, slug, name, description, billing_mode, duration_minutes, price_cents, deposit_cents, active, has_page, sort_order, category, created_at, updated_at)
        VALUES ('service', ?, ?, ?, 'fixed', ?, ?, 0, ?, 1, ?, ?, datetime('now'), datetime('now'))`,
     )
@@ -78,7 +78,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       .run();
   } catch (error) {
     if (!isMissingCategoryColumnError(error)) throw error;
-    result = await context.env.FNLSTG_DB.prepare(
+    result = await context.env.LNAPAGES_DB.prepare(
       `INSERT INTO items (type, slug, name, description, billing_mode, duration_minutes, price_cents, deposit_cents, active, has_page, sort_order, created_at, updated_at)
        VALUES ('service', ?, ?, ?, 'fixed', ?, ?, 0, ?, 1, ?, datetime('now'), datetime('now'))`,
     )

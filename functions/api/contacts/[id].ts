@@ -62,7 +62,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   try {
     await requireAdmin(context);
     const id = idSchema.parse(context.params.id);
-    const row = await context.env.FNLSTG_DB
+    const row = await context.env.LNAPAGES_DB
       .prepare('SELECT * FROM contacts WHERE id = ?')
       .bind(id)
       .first<ContactRow>();
@@ -86,7 +86,7 @@ export const onRequestPatch: PagesFunction<Env> = async (context) => {
     const emailLower = payload.email !== undefined ? normaliseEmail(payload.email) : undefined;
     const phoneE164  = payload.phone !== undefined ? normalisePhone(payload.phone) : undefined;
 
-    await context.env.FNLSTG_DB
+    await context.env.LNAPAGES_DB
       .prepare(`UPDATE contacts SET
         name             = COALESCE(?, name),
         email            = COALESCE(?, email),
@@ -114,7 +114,7 @@ export const onRequestPatch: PagesFunction<Env> = async (context) => {
       )
       .run();
 
-    const updated = await context.env.FNLSTG_DB
+    const updated = await context.env.LNAPAGES_DB
       .prepare('SELECT * FROM contacts WHERE id = ?')
       .bind(id)
       .first<ContactRow>();
@@ -133,7 +133,7 @@ export const onRequestDelete: PagesFunction<Env> = async (context) => {
   try {
     await requireAdmin(context);
     const id = idSchema.parse(context.params.id);
-    await context.env.FNLSTG_DB
+    await context.env.LNAPAGES_DB
       .prepare('DELETE FROM contacts WHERE id = ?')
       .bind(id)
       .run();

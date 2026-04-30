@@ -108,7 +108,7 @@ async function insertGalleryItem(
 ) {
   const bindings = [args.r2Key, args.title, args.altText, args.category, args.sortOrder, args.width ?? null, args.height ?? null];
   try {
-    return await env.FNLSTG_DB.prepare(
+    return await env.LNAPAGES_DB.prepare(
       `INSERT INTO gallery_items (r2_key, title, alt_text, category, sort_order, width, height, kind, created_at)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
     )
@@ -117,7 +117,7 @@ async function insertGalleryItem(
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     if (!/no column named kind/i.test(message)) throw error;
-    return env.FNLSTG_DB.prepare(
+    return env.LNAPAGES_DB.prepare(
       `INSERT INTO gallery_items (r2_key, title, alt_text, category, sort_order, width, height, created_at)
        VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
     )
@@ -136,7 +136,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
   let r2Items: Array<Record<string, unknown>> = [];
   if (includeR2) {
     try {
-      const { results } = await env.FNLSTG_DB.prepare(
+      const { results } = await env.LNAPAGES_DB.prepare(
         `SELECT gi.*,
                 COALESCE(
                   (SELECT json_group_array(git.tag)
@@ -153,7 +153,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
         return { ...mapped, selected: selectionOverrides[key] ?? true };
       });
     } catch {
-      const { results } = await env.FNLSTG_DB.prepare('SELECT * FROM gallery_items ORDER BY sort_order, id').all<Record<string, unknown>>();
+      const { results } = await env.LNAPAGES_DB.prepare('SELECT * FROM gallery_items ORDER BY sort_order, id').all<Record<string, unknown>>();
       r2Items = results.map((row: Record<string, unknown>) => {
         const mapped = mapGalleryRow(row, undefined, r2BaseUrl);
         const key = `r2:${String(row.id ?? '')}`;
@@ -226,9 +226,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
   const id = Number(result.meta.last_row_id ?? 0);
   try {
-    await env.FNLSTG_DB.batch(
+    await env.LNAPAGES_DB.batch(
       tags.map((tag) =>
-        env.FNLSTG_DB.prepare('INSERT OR IGNORE INTO gallery_item_tags (gallery_item_id, tag) VALUES (?, ?)').bind(id, tag),
+        env.LNAPAGES_DB.prepare('INSERT OR IGNORE INTO gallery_item_tags (gallery_item_id, tag) VALUES (?, ?)').bind(id, tag),
       ),
     );
   } catch {

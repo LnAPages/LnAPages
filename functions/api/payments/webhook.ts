@@ -44,13 +44,13 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
 
   if (event.type === 'payment_intent.succeeded') {
     const intent = event.data.object as Stripe.PaymentIntent;
-    const booking = await env.FNLSTG_DB
+    const booking = await env.LNAPAGES_DB
       .prepare('SELECT id, deposit_amount_cents FROM bookings WHERE stripe_payment_intent = ?')
       .bind(intent.id)
       .first<{ id: number; deposit_amount_cents: number }>();
     if (booking) {
       const paidInFull = (booking.deposit_amount_cents ?? 0) === 0 ? 1 : 0;
-      await env.FNLSTG_DB.prepare(
+      await env.LNAPAGES_DB.prepare(
         "UPDATE bookings SET status = ?, stripe_payment_intent = ?, paid_in_full = ?, paid_at = datetime('now'), deposit_paid = 1, updated_at = datetime('now') WHERE id = ?",
       )
         .bind('paid', intent.id, paidInFull, booking.id)
@@ -66,7 +66,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
     const chargeMode = session.metadata?.charge_mode === 'deposit' ? 'deposit' : 'full';
     const paidInFull = chargeMode === 'full' ? 1 : 0;
     if (bookingId > 0) {
-      await env.FNLSTG_DB.prepare(
+      await env.LNAPAGES_DB.prepare(
         "UPDATE bookings SET status = ?, stripe_payment_intent = ?, paid_in_full = ?, deposit_paid = 1, paid_at = datetime('now'), updated_at = datetime('now') WHERE id = ?",
       )
         .bind(paidInFull === 1 ? 'paid' : 'deposit_paid', String(session.payment_intent ?? ''), paidInFull, bookingId)

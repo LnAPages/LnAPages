@@ -79,7 +79,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   await requireAdmin(context);
   const now = Date.now();
   const stmts = SEED_PRESETS.map((p) =>
-    context.env.FNLSTG_DB
+    context.env.LNAPAGES_DB
       .prepare(
         'INSERT INTO theme_presets (id, label, vibe_description, theme_json, is_builtin, created_at, updated_at) ' +
         'VALUES (?, ?, ?, ?, 1, ?, ?) ' +
@@ -87,13 +87,13 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       )
       .bind(p.id, p.label, p.vibe_description, p.theme_json, now, now),
   );
-  await context.env.FNLSTG_DB.batch(stmts);
+  await context.env.LNAPAGES_DB.batch(stmts);
   return ok({ seeded: SEED_PRESETS.length, ids: SEED_PRESETS.map((p) => p.id) });
 };
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
   await requireAdmin(context);
-  const result = await context.env.FNLSTG_DB
+  const result = await context.env.LNAPAGES_DB
     .prepare('SELECT id, label, vibe_description, is_builtin, updated_at FROM theme_presets ORDER BY label')
     .all();
   return ok({ presets: result.results ?? [] });

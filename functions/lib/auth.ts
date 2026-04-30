@@ -118,7 +118,7 @@ export async function deriveInviteHmacKey(secret: string): Promise<CryptoKey> {
   const enc = new TextEncoder();
   const baseKey = await crypto.subtle.importKey('raw', enc.encode(secret), 'HKDF', false, ['deriveKey']);
   return crypto.subtle.deriveKey(
-    { name: 'HKDF', hash: 'SHA-256', salt: enc.encode(''), info: enc.encode('fnlstg:invite-v1') },
+    { name: 'HKDF', hash: 'SHA-256', salt: enc.encode(''), info: enc.encode('lnapages:invite-v1') },
     baseKey,
     { name: 'HMAC', hash: 'SHA-256', length: 256 },
     false,

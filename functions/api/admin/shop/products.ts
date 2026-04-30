@@ -16,7 +16,7 @@ const createSchema = z.object({
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
   await requireAdmin(context);
-  const { results } = await context.env.FNLSTG_DB.prepare(
+  const { results } = await context.env.LNAPAGES_DB.prepare(
     'SELECT id, slug, name, description, price_cents, kind, r2_key, active, created_at FROM products ORDER BY id DESC',
   ).all();
   return ok(results);
@@ -25,8 +25,8 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   await requireAdmin(context);
   const payload = await parseJson(context.request, createSchema);
-  const slug = await ensureUniqueProductSlug(context.env.FNLSTG_DB, payload.slug || payload.name);
-  const result = await context.env.FNLSTG_DB.prepare(
+  const slug = await ensureUniqueProductSlug(context.env.LNAPAGES_DB, payload.slug || payload.name);
+  const result = await context.env.LNAPAGES_DB.prepare(
     `INSERT INTO products (slug, name, description, price_cents, kind, r2_key, active)
      VALUES (?, ?, ?, ?, ?, ?, ?)`,
   )

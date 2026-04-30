@@ -17,7 +17,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
     return fail(500, 'MISCONFIGURED', 'Stripe is not configured');
   }
   const payload = await parseJson(request, schema);
-  const product = await env.FNLSTG_DB.prepare(
+  const product = await env.LNAPAGES_DB.prepare(
     'SELECT id, name, description, price_cents, active FROM products WHERE id = ?',
   ).bind(payload.productId).first<{ id: number; name: string; description: string | null; price_cents: number; active: number }>();
 

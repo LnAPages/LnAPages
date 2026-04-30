@@ -72,7 +72,7 @@ async function saveTheme(env: Env, request: Request) {
     sectionOrder,
   };
 
-  await env.FNLSTG_CONFIG.put(THEME_KEY, JSON.stringify(theme));
+  await env.LNAPAGES_CONFIG.put(THEME_KEY, JSON.stringify(theme));
   return ok(theme);
 }
 

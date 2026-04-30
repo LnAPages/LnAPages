@@ -38,24 +38,24 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
     const email = String(session.customer_email ?? session.metadata?.email ?? '').trim();
 
     if (productId > 0 && email) {
-      const existing = await env.FNLSTG_DB.prepare(
+      const existing = await env.LNAPAGES_DB.prepare(
         'SELECT id FROM orders WHERE stripe_session_id = ?',
       ).bind(session.id).first<{ id: number }>();
       if (!existing) {
-        await env.FNLSTG_DB.prepare(
+        await env.LNAPAGES_DB.prepare(
           `INSERT INTO orders (stripe_session_id, product_id, email, download_token, created_at)
            VALUES (?, ?, ?, ?, datetime('now'))`,
         ).bind(session.id, productId, email, crypto.randomUUID()).run();
       }
 
-      const product = await env.FNLSTG_DB.prepare(
+      const product = await env.LNAPAGES_DB.prepare(
         'SELECT id, kind, r2_key FROM products WHERE id = ?',
       ).bind(productId).first<{ id: number; kind: string; r2_key: string | null }>();
 
       if (product?.kind === 'digital' && product.r2_key) {
         const downloadUrl = await createDownloadUrl(env, product.r2_key);
         if (downloadUrl) {
-          await env.FNLSTG_DB.prepare(
+          await env.LNAPAGES_DB.prepare(
             `UPDATE orders SET fulfilled_at = datetime('now') WHERE stripe_session_id = ?`,
           ).bind(session.id).run();
           console.log(`[shop-webhook] send download URL to ${email}: ${downloadUrl}`);

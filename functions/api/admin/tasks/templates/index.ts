@@ -41,7 +41,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   if (scope) { query += ' AND scope = ?'; binds.push(scope); }
   query += ' ORDER BY created_at DESC';
 
-  const rows = await context.env.FNLSTG_DB.prepare(query).bind(...binds).all<TemplateRow>();
+  const rows = await context.env.LNAPAGES_DB.prepare(query).bind(...binds).all<TemplateRow>();
   return ok(rows.results);
 };
 
@@ -52,7 +52,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
   const body = await parseJson(request, createSchema);
 
-  const result = await env.FNLSTG_DB
+  const result = await env.LNAPAGES_DB
     .prepare(
       `INSERT INTO task_templates (name, description, scope, scope_ref_id, active, created_by, created_at, updated_at)
        VALUES (?, ?, ?, ?, 1, ?, datetime('now'), datetime('now'))`,
@@ -64,14 +64,14 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
   if (body.items.length > 0) {
     const itemStmts = body.items.map((item, i) =>
-      env.FNLSTG_DB
+      env.LNAPAGES_DB
         .prepare(`INSERT INTO task_template_items (template_id, position, title, hint, required) VALUES (?, ?, ?, ?, ?)`)
         .bind(templateId, i, item.title, item.hint ?? null, item.required ? 1 : 0),
     );
-    await env.FNLSTG_DB.batch(itemStmts);
+    await env.LNAPAGES_DB.batch(itemStmts);
   }
 
-  await writeAuditLog(env.FNLSTG_DB, 'task_template.create', {
+  await writeAuditLog(env.LNAPAGES_DB, 'task_template.create', {
     userId: user.id,
     resourceType: 'task_template',
     resourceId: String(templateId),

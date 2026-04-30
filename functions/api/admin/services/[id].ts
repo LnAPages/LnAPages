@@ -24,7 +24,7 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
 
   let result;
   try {
-    result = await context.env.FNLSTG_DB.prepare(
+    result = await context.env.LNAPAGES_DB.prepare(
       `UPDATE items
        SET name = COALESCE(?, name),
            slug = COALESCE(?, slug),
@@ -51,7 +51,7 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
       .run();
   } catch (error) {
     if (!isMissingCategoryColumnError(error)) throw error;
-    result = await context.env.FNLSTG_DB.prepare(
+    result = await context.env.LNAPAGES_DB.prepare(
       `UPDATE items
        SET name = COALESCE(?, name),
            slug = COALESCE(?, slug),
@@ -82,13 +82,13 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
 
   let updated = null;
   try {
-    updated = await context.env.FNLSTG_DB.prepare(
+    updated = await context.env.LNAPAGES_DB.prepare(
       `SELECT id, slug, name, description, duration_minutes, price_cents, category, active, sort_order, created_at, updated_at
        FROM items WHERE id = ? AND type IN ('service','bundle')`,
     ).bind(id).first();
   } catch (error) {
     if (!isMissingCategoryColumnError(error)) throw error;
-    const fallback = await context.env.FNLSTG_DB.prepare(
+    const fallback = await context.env.LNAPAGES_DB.prepare(
       `SELECT id, slug, name, description, duration_minutes, price_cents, active, sort_order, created_at, updated_at
        FROM items WHERE id = ? AND type IN ('service','bundle')`,
     ).bind(id).first<Record<string, unknown>>();

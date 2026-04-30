@@ -13,7 +13,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   await requireAdmin(context);
   const { env } = context;
 
-  const alreadyRan = await env.FNLSTG_CONFIG.get(MIGRATION_KEY);
+  const alreadyRan = await env.LNAPAGES_CONFIG.get(MIGRATION_KEY);
   if (alreadyRan) {
     return fail(409, 'ALREADY_RAN', 'Select-all migration already ran');
   }
@@ -32,8 +32,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     inserted += 1;
   }
 
-  await env.FNLSTG_CONFIG.put(GALLERY_DRIVE_OVERRIDES_KV_KEY, JSON.stringify(overrides));
-  await env.FNLSTG_CONFIG.put(MIGRATION_KEY, new Date().toISOString());
+  await env.LNAPAGES_CONFIG.put(GALLERY_DRIVE_OVERRIDES_KV_KEY, JSON.stringify(overrides));
+  await env.LNAPAGES_CONFIG.put(MIGRATION_KEY, new Date().toISOString());
 
   return ok({
     inserted,

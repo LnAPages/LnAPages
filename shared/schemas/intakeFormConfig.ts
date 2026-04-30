@@ -3,7 +3,7 @@ import { z } from 'zod';
 /**
  * Intake form (public /quote page) configuration.
  *
- * Stored as a single JSON blob in the FNLSTG_CONFIG KV namespace under the
+ * Stored as a single JSON blob in the LNAPAGES_CONFIG KV namespace under the
  * key 'intake-form-config'. Edited from /admin/intakes -> Form settings.
  *
  * The shape of submitted intakes is still governed by shared/schemas/intake.ts;

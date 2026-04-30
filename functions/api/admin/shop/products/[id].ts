@@ -18,8 +18,8 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
   await requireAdmin(context);
   const id = idSchema.parse(context.params.id);
   const payload = await parseJson(context.request, updateSchema);
-  const slug = payload.slug ? await ensureUniqueProductSlug(context.env.FNLSTG_DB, payload.slug, id) : null;
-  const result = await context.env.FNLSTG_DB.prepare(
+  const slug = payload.slug ? await ensureUniqueProductSlug(context.env.LNAPAGES_DB, payload.slug, id) : null;
+  const result = await context.env.LNAPAGES_DB.prepare(
     `UPDATE products
      SET slug = COALESCE(?, slug),
          name = COALESCE(?, name),
@@ -42,7 +42,7 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
     )
     .run();
   if (!result.meta.changes) throw new HttpError(404, 'NOT_FOUND', 'Product not found');
-  const updated = await context.env.FNLSTG_DB.prepare(
+  const updated = await context.env.LNAPAGES_DB.prepare(
     'SELECT id, slug, name, description, price_cents, kind, r2_key, active, created_at FROM products WHERE id = ?',
   ).bind(id).first();
   return ok(updated);
@@ -51,8 +51,8 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
 export const onRequestDelete: PagesFunction<Env> = async (context) => {
   await requireAdmin(context);
   const id = idSchema.parse(context.params.id);
-  await context.env.FNLSTG_DB.prepare('DELETE FROM product_tags WHERE product_id = ?').bind(id).run();
-  const result = await context.env.FNLSTG_DB.prepare('DELETE FROM products WHERE id = ?').bind(id).run();
+  await context.env.LNAPAGES_DB.prepare('DELETE FROM product_tags WHERE product_id = ?').bind(id).run();
+  const result = await context.env.LNAPAGES_DB.prepare('DELETE FROM products WHERE id = ?').bind(id).run();
   if (!result.meta.changes) throw new HttpError(404, 'NOT_FOUND', 'Product not found');
   return ok({ id });
 };

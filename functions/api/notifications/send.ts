@@ -34,7 +34,7 @@ async function sendSms(env: Env, to: string, message: string): Promise<void> {
 
 export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
   const payload = schema.parse(await request.json());
-  const prefs = await env.FNLSTG_DB.prepare('SELECT * FROM notification_prefs WHERE id = 1').first<{
+  const prefs = await env.LNAPAGES_DB.prepare('SELECT * FROM notification_prefs WHERE id = 1').first<{
     admin_email: string;
     admin_phone: string;
     channel: 'email' | 'sms' | 'both';

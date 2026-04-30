@@ -24,13 +24,13 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   const id = Number(context.params['id']);
   if (!id) throw new HttpError(400, 'BAD_REQUEST', 'Invalid id');
 
-  const template = await context.env.FNLSTG_DB
+  const template = await context.env.LNAPAGES_DB
     .prepare(`SELECT * FROM task_templates WHERE id = ?`)
     .bind(id)
     .first();
   if (!template) throw new HttpError(404, 'NOT_FOUND', 'Template not found');
 
-  const items = await context.env.FNLSTG_DB
+  const items = await context.env.LNAPAGES_DB
     .prepare(`SELECT id, position, title, hint, required FROM task_template_items WHERE template_id = ? ORDER BY position`)
     .bind(id)
     .all();
@@ -57,21 +57,21 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
   if (body.active !== undefined) { setClauses.push('active = ?'); binds.push(body.active ? 1 : 0); }
   binds.push(id);
 
-  await env.FNLSTG_DB.prepare(`UPDATE task_templates SET ${setClauses.join(', ')} WHERE id = ?`).bind(...binds).run();
+  await env.LNAPAGES_DB.prepare(`UPDATE task_templates SET ${setClauses.join(', ')} WHERE id = ?`).bind(...binds).run();
 
   if (body.items !== undefined) {
-    await env.FNLSTG_DB.prepare(`DELETE FROM task_template_items WHERE template_id = ?`).bind(id).run();
+    await env.LNAPAGES_DB.prepare(`DELETE FROM task_template_items WHERE template_id = ?`).bind(id).run();
     if (body.items.length > 0) {
       const stmts = body.items.map((item, i) =>
-        env.FNLSTG_DB
+        env.LNAPAGES_DB
           .prepare(`INSERT INTO task_template_items (template_id, position, title, hint, required) VALUES (?, ?, ?, ?, ?)`)
           .bind(id, i, item.title, item.hint ?? null, item.required ? 1 : 0),
       );
-      await env.FNLSTG_DB.batch(stmts);
+      await env.LNAPAGES_DB.batch(stmts);
     }
   }
 
-  await writeAuditLog(env.FNLSTG_DB, 'task_template.update', {
+  await writeAuditLog(env.LNAPAGES_DB, 'task_template.update', {
     userId: user.id,
     resourceType: 'task_template',
     resourceId: String(id),
@@ -90,9 +90,9 @@ export const onRequestDelete: PagesFunction<Env> = async (context) => {
   const id = Number(context.params['id']);
   if (!id) throw new HttpError(400, 'BAD_REQUEST', 'Invalid id');
 
-  await env.FNLSTG_DB.prepare(`UPDATE task_templates SET active = 0, updated_at = datetime('now') WHERE id = ?`).bind(id).run();
+  await env.LNAPAGES_DB.prepare(`UPDATE task_templates SET active = 0, updated_at = datetime('now') WHERE id = ?`).bind(id).run();
 
-  await writeAuditLog(env.FNLSTG_DB, 'task_template.delete', {
+  await writeAuditLog(env.LNAPAGES_DB, 'task_template.delete', {
     userId: user.id,
     resourceType: 'task_template',
     resourceId: String(id),

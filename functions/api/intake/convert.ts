@@ -89,7 +89,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
     await requireAdmin(context);
     const payload = await parseJson(context.request, convertSchema);
-    const db = context.env.FNLSTG_DB;
+    const db = context.env.LNAPAGES_DB;
 
     // 1. Load the intake. Tolerate older rows where contact_id / booking_id
     //    columns may not yet have been populated — they default to NULL.

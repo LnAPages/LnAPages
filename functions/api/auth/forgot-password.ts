@@ -17,14 +17,14 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
   // Rate limit: 3 per email per hour
   const bucketKey = `pwd_reset:${body.email}`;
-  const limited = await checkRateLimit(env.FNLSTG_DB, bucketKey, 3, 60);
+  const limited = await checkRateLimit(env.LNAPAGES_DB, bucketKey, 3, 60);
   if (limited) {
     // Return ok to avoid user enumeration
     return ok({ sent: true });
   }
-  await recordRateLimit(env.FNLSTG_DB, bucketKey);
+  await recordRateLimit(env.LNAPAGES_DB, bucketKey);
 
-  const user = await env.FNLSTG_DB
+  const user = await env.LNAPAGES_DB
     .prepare(`SELECT id, email, name, status FROM admin_users WHERE email = ?`)
     .bind(body.email)
     .first<{ id: number; email: string; name: string; status: string }>();
@@ -38,7 +38,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   const kvKey = `pwd_reset:${tokenHash}`;
   const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
 
-  await env.FNLSTG_CONFIG.put(kvKey, JSON.stringify({ email: user.email, userId: user.id, expiresAt }), {
+  await env.LNAPAGES_CONFIG.put(kvKey, JSON.stringify({ email: user.email, userId: user.id, expiresAt }), {
     expirationTtl: 3600,
   });
 
@@ -58,7 +58,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     }).catch((err: unknown) => console.error('[forgot-password] email send failed:', err));
   }
 
-  await writeAuditLog(env.FNLSTG_DB, 'auth.password_reset_requested', {
+  await writeAuditLog(env.LNAPAGES_DB, 'auth.password_reset_requested', {
     userId: user.id,
     ip,
     ua,
