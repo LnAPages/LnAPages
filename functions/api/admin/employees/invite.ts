@@ -18,7 +18,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   const body = await parseJson(request, schema);
 
   // Check not already an active user
-  const existing = await env.FNLSTG_DB
+  const existing = await env.LNAPAGES_DB
     .prepare(`SELECT id, status FROM admin_users WHERE email = ?`)
     .bind(body.email)
     .first<{ id: number; status: string }>();
@@ -28,7 +28,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   }
 
   // Remove any stale invite
-  await env.FNLSTG_DB
+  await env.LNAPAGES_DB
     .prepare(`DELETE FROM admin_invites WHERE email = ?`)
     .bind(body.email)
     .run();
@@ -44,7 +44,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
   const expiresAt = new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString();
 
-  await env.FNLSTG_DB
+  await env.LNAPAGES_DB
     .prepare(
       `INSERT INTO admin_invites (email, role, token_hash, invited_by, expires_at, created_at)
        VALUES (?, ?, ?, ?, ?, datetime('now'))`,
@@ -52,7 +52,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     .bind(body.email, body.role, tokenHash, user.id, expiresAt)
     .run();
 
-  await writeAuditLog(env.FNLSTG_DB, 'employee.invite', {
+  await writeAuditLog(env.LNAPAGES_DB, 'employee.invite', {
     userId: user.id,
     resourceType: 'invite',
     metadata: { email: body.email, role: body.role },
