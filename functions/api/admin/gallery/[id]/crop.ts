@@ -52,13 +52,13 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   const itemId = parseItemId(context.params as Record<string, string>);
   if (!itemId) return fail(400, 'INVALID_ID', 'Invalid gallery item id');
 
-  const item = await context.env.FNLSTG_DB
+  const item = await context.env.LNAPAGES_DB
     .prepare('SELECT id FROM gallery_items WHERE id = ?')
     .bind(itemId)
     .first<{ id: number }>();
   if (!item) return fail(404, 'NOT_FOUND', 'Gallery item not found');
 
-  const { results } = await context.env.FNLSTG_DB
+  const { results } = await context.env.LNAPAGES_DB
     .prepare('SELECT * FROM gallery_crops WHERE gallery_item_id = ? ORDER BY context_key')
     .bind(itemId)
     .all<CropRow>();
@@ -74,19 +74,19 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
 
   const payload = await parseJson(context.request, cropUpsertSchema);
 
-  const item = await context.env.FNLSTG_DB
+  const item = await context.env.LNAPAGES_DB
     .prepare('SELECT id FROM gallery_items WHERE id = ?')
     .bind(itemId)
     .first<{ id: number }>();
   if (!item) return fail(404, 'NOT_FOUND', 'Gallery item not found');
 
-  const existing = await context.env.FNLSTG_DB
+  const existing = await context.env.LNAPAGES_DB
     .prepare('SELECT id FROM gallery_crops WHERE gallery_item_id = ? AND context_key = ?')
     .bind(itemId, payload.context_key)
     .first<{ id: number }>();
 
   if (existing) {
-    await context.env.FNLSTG_DB
+    await context.env.LNAPAGES_DB
       .prepare(
         `UPDATE gallery_crops SET
           aspect = ?, crop_x = ?, crop_y = ?, crop_width = ?, crop_height = ?,
@@ -100,7 +100,7 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
       )
       .run();
   } else {
-    await context.env.FNLSTG_DB
+    await context.env.LNAPAGES_DB
       .prepare(
         `INSERT INTO gallery_crops
           (gallery_item_id, context_key, aspect, crop_x, crop_y, crop_width, crop_height, rotation, flip_h, flip_v)
@@ -114,7 +114,7 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
       .run();
   }
 
-  const saved = await context.env.FNLSTG_DB
+  const saved = await context.env.LNAPAGES_DB
     .prepare('SELECT * FROM gallery_crops WHERE gallery_item_id = ? AND context_key = ?')
     .bind(itemId, payload.context_key)
     .first<CropRow>();
@@ -134,13 +134,13 @@ export const onRequestDelete: PagesFunction<Env> = async (context) => {
     return fail(400, 'INVALID_CONTEXT', 'Valid context query param required');
   }
 
-  const existing = await context.env.FNLSTG_DB
+  const existing = await context.env.LNAPAGES_DB
     .prepare('SELECT id FROM gallery_crops WHERE gallery_item_id = ? AND context_key = ?')
     .bind(itemId, contextKey)
     .first<{ id: number }>();
   if (!existing) return fail(404, 'NOT_FOUND', 'Crop not found');
 
-  await context.env.FNLSTG_DB
+  await context.env.LNAPAGES_DB
     .prepare('DELETE FROM gallery_crops WHERE id = ?')
     .bind(existing.id)
     .run();
@@ -156,13 +156,13 @@ export const onRequestPatch: PagesFunction<Env> = async (context) => {
 
   const payload = await parseJson(context.request, focalUpdateSchema);
 
-  const item = await context.env.FNLSTG_DB
+  const item = await context.env.LNAPAGES_DB
     .prepare('SELECT id FROM gallery_items WHERE id = ?')
     .bind(itemId)
     .first<{ id: number }>();
   if (!item) return fail(404, 'NOT_FOUND', 'Gallery item not found');
 
-  await context.env.FNLSTG_DB
+  await context.env.LNAPAGES_DB
     .prepare('UPDATE gallery_items SET focal_x = ?, focal_y = ? WHERE id = ?')
     .bind(payload.focal_x, payload.focal_y, itemId)
     .run();
