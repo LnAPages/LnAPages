@@ -34,7 +34,7 @@ async function validateInviteToken(
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('');
 
-  return env.FNLSTG_DB
+  return env.LNAPAGES_DB
     .prepare(
       `SELECT id, email, role, token_hash, invited_by, expires_at, accepted_at
        FROM admin_invites WHERE token_hash = ?`,
@@ -75,14 +75,14 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   const ua = request.headers.get('user-agent') ?? '';
 
   // Upsert user
-  const existing = await env.FNLSTG_DB
+  const existing = await env.LNAPAGES_DB
     .prepare(`SELECT id FROM admin_users WHERE email = ?`)
     .bind(invite.email)
     .first<{ id: number }>();
 
   let userId: number;
   if (existing) {
-    await env.FNLSTG_DB
+    await env.LNAPAGES_DB
       .prepare(
         `UPDATE admin_users SET
            password_hash = ?, password_salt = ?, password_algo = ?,
@@ -96,7 +96,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       .run();
     userId = existing.id;
   } else {
-    const result = await env.FNLSTG_DB
+    const result = await env.LNAPAGES_DB
       .prepare(
         `INSERT INTO admin_users
            (email, name, role, status, password_hash, password_salt, password_algo,
@@ -114,12 +114,12 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     userId = Number(result.meta.last_row_id ?? 0);
   }
 
-  await env.FNLSTG_DB
+  await env.LNAPAGES_DB
     .prepare(`UPDATE admin_invites SET accepted_at = datetime('now') WHERE id = ?`)
     .bind(invite.id)
     .run();
 
-  await writeAuditLog(env.FNLSTG_DB, 'auth.invite_accepted', {
+  await writeAuditLog(env.LNAPAGES_DB, 'auth.invite_accepted', {
     userId,
     resourceType: 'invite',
     resourceId: String(invite.id),
