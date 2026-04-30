@@ -36,7 +36,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   const targetId = Number(context.params['id']);
   if (!targetId) throw new HttpError(400, 'BAD_REQUEST', 'Invalid employee id');
 
-  const employee = await context.env.FNLSTG_DB
+  const employee = await context.env.LNAPAGES_DB
     .prepare(
       `SELECT id, email, name, role, status, invited_at, last_login_at, failed_login_count, locked_until, created_at
        FROM admin_users WHERE id = ?`,
@@ -46,7 +46,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
   if (!employee) throw new HttpError(404, 'NOT_FOUND', 'Employee not found');
 
-  const perms = await context.env.FNLSTG_DB
+  const perms = await context.env.LNAPAGES_DB
     .prepare(`SELECT panel_key, can_view, can_edit FROM admin_panel_permissions WHERE user_id = ?`)
     .bind(targetId)
     .all<PermissionRow>();
@@ -77,12 +77,12 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
   if (body.status !== undefined) { setClauses.push('status = ?'); binds.push(body.status); }
   binds.push(targetId);
 
-  await env.FNLSTG_DB
+  await env.LNAPAGES_DB
     .prepare(`UPDATE admin_users SET ${setClauses.join(', ')} WHERE id = ?`)
     .bind(...binds)
     .run();
 
-  await writeAuditLog(env.FNLSTG_DB, 'employee.update', {
+  await writeAuditLog(env.LNAPAGES_DB, 'employee.update', {
     userId: user.id,
     resourceType: 'admin_user',
     resourceId: String(targetId),
@@ -107,18 +107,18 @@ export const onRequestDelete: PagesFunction<Env> = async (context) => {
   if (!targetId) throw new HttpError(400, 'BAD_REQUEST', 'Invalid employee id');
   if (targetId === user.id) throw new HttpError(400, 'BAD_REQUEST', 'Cannot delete yourself');
 
-  await env.FNLSTG_DB
+  await env.LNAPAGES_DB
     .prepare(`UPDATE admin_users SET status = 'deleted' WHERE id = ?`)
     .bind(targetId)
     .run();
 
   // Revoke active sessions
-  await env.FNLSTG_DB
+  await env.LNAPAGES_DB
     .prepare(`UPDATE admin_sessions SET revoked_at = datetime('now') WHERE user_id = ? AND revoked_at IS NULL`)
     .bind(targetId)
     .run();
 
-  await writeAuditLog(env.FNLSTG_DB, 'employee.delete', {
+  await writeAuditLog(env.LNAPAGES_DB, 'employee.delete', {
     userId: user.id,
     resourceType: 'admin_user',
     resourceId: String(targetId),
