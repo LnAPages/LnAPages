@@ -91,13 +91,13 @@ function normalizeGallerySource(raw: unknown): GallerySourceConfig {
 }
 
 export async function getGallerySourceConfig(env: Env): Promise<GallerySourceConfig> {
-  const raw = await env.FNLSTG_CONFIG.get(GALLERY_SOURCE_KV_KEY, 'json');
+  const raw = await env.LNAPAGES_CONFIG.get(GALLERY_SOURCE_KV_KEY, 'json');
   return normalizeGallerySource(raw);
 }
 
 export async function putGallerySourceConfig(env: Env, config: GallerySourceConfig): Promise<void> {
   const normalized = normalizeGallerySource(config);
-  await env.FNLSTG_CONFIG.put(GALLERY_SOURCE_KV_KEY, JSON.stringify(normalized));
+  await env.LNAPAGES_CONFIG.put(GALLERY_SOURCE_KV_KEY, JSON.stringify(normalized));
 }
 
 async function listDriveFilesViaApi(apiKey: string, folderId: string): Promise<DriveApiFile[]> {
@@ -203,7 +203,7 @@ function normalizeDriveGalleryOverride(raw: unknown): DriveGalleryOverride | nul
 }
 
 export async function getDriveGalleryOverrides(env: Env): Promise<Record<string, DriveGalleryOverride>> {
-  const raw = await env.FNLSTG_CONFIG.get(GALLERY_DRIVE_OVERRIDES_KV_KEY, 'json');
+  const raw = await env.LNAPAGES_CONFIG.get(GALLERY_DRIVE_OVERRIDES_KV_KEY, 'json');
   if (!raw || typeof raw !== 'object') return {};
   const parsed = raw as Record<string, unknown>;
   const entries = Object.entries(parsed)
@@ -221,12 +221,12 @@ export async function putDriveGalleryOverride(env: Env, driveId: string, overrid
   const current = await getDriveGalleryOverrides(env);
   if (normalized) current[driveId] = normalized;
   else delete current[driveId];
-  await env.FNLSTG_CONFIG.put(GALLERY_DRIVE_OVERRIDES_KV_KEY, JSON.stringify(current));
+  await env.LNAPAGES_CONFIG.put(GALLERY_DRIVE_OVERRIDES_KV_KEY, JSON.stringify(current));
   return normalized ?? {};
 }
 
 export async function getGallerySelectionOverrides(env: Env): Promise<Record<string, boolean>> {
-  const raw = await env.FNLSTG_CONFIG.get(GALLERY_SELECTION_OVERRIDES_KV_KEY, 'json');
+  const raw = await env.LNAPAGES_CONFIG.get(GALLERY_SELECTION_OVERRIDES_KV_KEY, 'json');
   if (!raw || typeof raw !== 'object') return {};
   const entries = Object.entries(raw as Record<string, unknown>)
     .filter(([key, value]) => Boolean(key) && typeof value === 'boolean') as Array<[string, boolean]>;
@@ -238,5 +238,5 @@ export async function putGallerySelectionOverride(env: Env, key: string, selecte
   if (!id) throw new Error('Invalid gallery selection key');
   const current = await getGallerySelectionOverrides(env);
   current[id] = selected;
-  await env.FNLSTG_CONFIG.put(GALLERY_SELECTION_OVERRIDES_KV_KEY, JSON.stringify(current));
+  await env.LNAPAGES_CONFIG.put(GALLERY_SELECTION_OVERRIDES_KV_KEY, JSON.stringify(current));
 }
