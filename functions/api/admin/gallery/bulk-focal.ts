@@ -16,11 +16,11 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { items } = await parseJson(context.request, bulkFocalSchema);
 
   const stmts = items.map((item) =>
-    context.env.FNLSTG_DB
+    context.env.LNAPAGES_DB
       .prepare('UPDATE gallery_items SET focal_x = ?, focal_y = ? WHERE id = ?')
       .bind(item.focal_x, item.focal_y, item.id),
   );
-  await context.env.FNLSTG_DB.batch(stmts);
+  await context.env.LNAPAGES_DB.batch(stmts);
 
   return ok({ updated: items.length });
 };
