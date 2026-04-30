@@ -86,16 +86,16 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
         .bind(...addonIds)
         .all<{ id: number; price_cents: number; active: number }>();
 
-      const foundIds = new Set((addons ?? []).map((a) => a.id));
+      const foundIds = new Set((addons ?? []).map((a: { id: number; price_cents: number; active: number }) => a.id));
       const missing = addonIds.filter((id) => !foundIds.has(id));
       if (missing.length > 0) {
         return fail(400, 'invalid_addon', `Add-on item(s) not found: ${missing.join(', ')}`);
       }
-      const inactive = (addons ?? []).filter((a) => a.active !== 1).map((a) => a.id);
+      const inactive = (addons ?? []).filter((a: { id: number; price_cents: number; active: number }) => a.active !== 1).map((a: { id: number; price_cents: number; active: number }) => a.id);
       if (inactive.length > 0) {
         return fail(400, 'inactive_addon', `Add-on item(s) not active: ${inactive.join(', ')}`);
       }
-      addonTotal = (addons ?? []).reduce((sum, a) => sum + a.price_cents, 0);
+      addonTotal = (addons ?? []).reduce((sum: number, a: { id: number; price_cents: number; active: number }) => sum + a.price_cents, 0);
     }
 
     // 4. Compute totals and enforce deposit policy.
