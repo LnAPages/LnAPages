@@ -28,7 +28,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   if (scope) { query += ' AND scope = ?'; binds.push(scope); }
   query += ' ORDER BY trigger_event, scope';
 
-  const rows = await context.env.FNLSTG_DB.prepare(query).bind(...binds).all();
+  const rows = await context.env.LNAPAGES_DB.prepare(query).bind(...binds).all();
   return ok(rows.results);
 };
 
@@ -39,7 +39,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
   const body = await parseJson(request, createSchema);
 
-  const result = await env.FNLSTG_DB
+  const result = await env.LNAPAGES_DB
     .prepare(
       `INSERT INTO auto_response_templates
          (trigger_event, scope, scope_ref_id, channel, subject, body_text, body_html, active, created_by, created_at, updated_at)
@@ -60,7 +60,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
   const id = Number(result.meta.last_row_id ?? 0);
 
-  await writeAuditLog(env.FNLSTG_DB, 'auto_response.create', {
+  await writeAuditLog(env.LNAPAGES_DB, 'auto_response.create', {
     userId: user.id,
     resourceType: 'auto_response_template',
     resourceId: String(id),
