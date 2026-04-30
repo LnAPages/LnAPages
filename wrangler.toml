@@ -4,17 +4,17 @@ compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = "dist"
 
 [[d1_databases]]
-binding = "LNAPAGES_DB"
+binding = "FNLSTG_DB"
 database_name = "lnapages"
 database_id = "f6f4f30a-ec78-4f76-98a4-9f51445afe73"
 migrations_dir = "migrations"
 
 [[r2_buckets]]
-binding = "LNAPAGES_GALLERY"
+binding = "FNLSTG_GALLERY"
 bucket_name = "lnapages-gallery"
 
 [[kv_namespaces]]
-binding = "LNAPAGES_CONFIG"
+binding = "FNLSTG_CONFIG"
 id = "e776936711fe4c91a9e31a89534732de"
 
 [vars]
