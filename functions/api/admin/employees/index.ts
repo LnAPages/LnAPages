@@ -18,7 +18,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     throw new HttpError(403, 'FORBIDDEN', 'Insufficient permissions');
   }
 
-  const rows = await context.env.FNLSTG_DB
+  const rows = await context.env.LNAPAGES_DB
     .prepare(
       `SELECT id, email, name, role, status, invited_at, last_login_at, created_at
        FROM admin_users
