@@ -35,7 +35,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   query += ' ORDER BY e.incurred_on DESC, e.id DESC LIMIT ? OFFSET ?';
   binds.push(limit, offset);
 
-  const rows = await context.env.FNLSTG_DB.prepare(query).bind(...binds).all();
+  const rows = await context.env.LNAPAGES_DB.prepare(query).bind(...binds).all();
 
   // Total for the same filters
   let countQuery = 'SELECT SUM(amount_cents) as total_cents, COUNT(*) as count FROM expenses e WHERE 1=1';
@@ -43,7 +43,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   if (categoryId) { countQuery += ' AND e.category_id = ?'; countBinds.push(Number(categoryId)); }
   if (from) { countQuery += ' AND e.incurred_on >= ?'; countBinds.push(from); }
   if (to) { countQuery += ' AND e.incurred_on <= ?'; countBinds.push(to); }
-  const summary = await context.env.FNLSTG_DB.prepare(countQuery).bind(...countBinds).first<{ total_cents: number; count: number }>();
+  const summary = await context.env.LNAPAGES_DB.prepare(countQuery).bind(...countBinds).first<{ total_cents: number; count: number }>();
 
   return ok({ expenses: rows.results, totalCents: summary?.total_cents ?? 0, count: summary?.count ?? 0 });
 };
@@ -55,7 +55,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
   const body = await parseJson(request, createSchema);
 
-  const result = await env.FNLSTG_DB
+  const result = await env.LNAPAGES_DB
     .prepare(
       `INSERT INTO expenses (category_id, vendor, description, amount_cents, currency, incurred_on, payment_method, notes, created_by, created_at, updated_at)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
@@ -75,7 +75,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
   const expenseId = Number(result.meta.last_row_id ?? 0);
 
-  await writeAuditLog(env.FNLSTG_DB, 'expense.create', {
+  await writeAuditLog(env.LNAPAGES_DB, 'expense.create', {
     userId: user.id,
     resourceType: 'expense',
     resourceId: String(expenseId),
