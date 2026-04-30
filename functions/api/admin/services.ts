@@ -7,7 +7,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   await requireAdmin(context);
   let results: Array<Record<string, unknown>>;
   try {
-    const query = await context.env.FNLSTG_DB.prepare(
+    const query = await context.env.LNAPAGES_DB.prepare(
       `SELECT ${CATEGORY_SERVICE_COLUMNS}
        FROM items
        WHERE type IN ('service','bundle')
@@ -16,7 +16,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     results = query.results;
   } catch (error) {
     if (isMissingCategoryColumnError(error)) {
-      const query = await context.env.FNLSTG_DB.prepare(
+      const query = await context.env.LNAPAGES_DB.prepare(
         `SELECT ${BASE_SERVICE_COLUMNS}
          FROM items
          WHERE type IN ('service','bundle')
@@ -25,7 +25,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       results = withDerivedServiceCategory(query.results);
     } else if (isMissingTableError(error, 'items')) {
       try {
-        const query = await context.env.FNLSTG_DB.prepare(
+        const query = await context.env.LNAPAGES_DB.prepare(
           `SELECT ${BASE_SERVICE_COLUMNS}
            FROM services
            WHERE type IN ('service','bundle')
@@ -34,7 +34,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
         results = withDerivedServiceCategory(query.results);
       } catch (legacyError) {
         if (!isMissingColumnError(legacyError, 'type')) throw legacyError;
-        const query = await context.env.FNLSTG_DB.prepare(
+        const query = await context.env.LNAPAGES_DB.prepare(
           `SELECT ${BASE_SERVICE_COLUMNS}
            FROM services
            ORDER BY sort_order, id`,
