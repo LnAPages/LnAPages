@@ -75,7 +75,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       .all<{ position: number; title: string; hint: string | null }>();
 
     if (templateItems.results.length > 0) {
-      const stmts = templateItems.results.map((item) =>
+      const stmts = templateItems.results.map((item: { position: number; title: string; hint: string | null }) =>
         env.FNLSTG_DB
           .prepare(`INSERT INTO task_items (task_id, position, title) VALUES (?, ?, ?)`)
           .bind(taskId, item.position, item.title),
