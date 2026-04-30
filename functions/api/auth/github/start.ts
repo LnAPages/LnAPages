@@ -5,7 +5,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
   requireGitHubOAuth(env);
 
   const state = crypto.randomUUID();
-  await env.FNLSTG_CONFIG.put(`${OAUTH_STATE_PREFIX}${state}`, '1', { expirationTtl: 600 });
+  await env.LNAPAGES_CONFIG.put(`${OAUTH_STATE_PREFIX}${state}`, '1', { expirationTtl: 600 });
 
   const authorizeUrl = new URL('https://github.com/login/oauth/authorize');
   authorizeUrl.searchParams.set('client_id', env.GITHUB_OAUTH_CLIENT_ID);

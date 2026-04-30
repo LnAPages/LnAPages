@@ -22,7 +22,7 @@ export const onRequestPatch: PagesFunction<Env> = async (context) => {
   const category = payload.category ?? (payload.tags ? normalizeGalleryTags(payload.tags)[0] : undefined);
   const sortOrder = payload.sort_order ?? payload.sortOrder;
   const altText = payload.alt_text ?? payload.altText;
-  await env.FNLSTG_DB.prepare(
+  await env.LNAPAGES_DB.prepare(
     `UPDATE gallery_items SET
       sort_order = COALESCE(?, sort_order),
       title = COALESCE(?, title),
@@ -35,12 +35,12 @@ export const onRequestPatch: PagesFunction<Env> = async (context) => {
     const tags = normalizeGalleryTags(payload.tags, category);
     try {
       const statements = [
-        env.FNLSTG_DB.prepare('DELETE FROM gallery_item_tags WHERE gallery_item_id = ?').bind(id),
+        env.LNAPAGES_DB.prepare('DELETE FROM gallery_item_tags WHERE gallery_item_id = ?').bind(id),
         ...tags.map((tag) =>
-          env.FNLSTG_DB.prepare('INSERT OR IGNORE INTO gallery_item_tags (gallery_item_id, tag) VALUES (?, ?)').bind(id, tag),
+          env.LNAPAGES_DB.prepare('INSERT OR IGNORE INTO gallery_item_tags (gallery_item_id, tag) VALUES (?, ?)').bind(id, tag),
         ),
       ];
-      await env.FNLSTG_DB.batch(statements);
+      await env.LNAPAGES_DB.batch(statements);
     } catch {
       // Best effort when migration has not been applied yet.
     }
@@ -52,8 +52,8 @@ export const onRequestDelete: PagesFunction<Env> = async (context) => {
   await requireAdmin(context);
   const { env, params } = context;
   const id = idSchema.parse(params.id);
-  const row = await env.FNLSTG_DB.prepare('SELECT r2_key FROM gallery_items WHERE id = ?').bind(id).first<{ r2_key: string }>();
-  if (row) await env.FNLSTG_GALLERY.delete(row.r2_key);
-  await env.FNLSTG_DB.prepare('DELETE FROM gallery_items WHERE id = ?').bind(id).run();
+  const row = await env.LNAPAGES_DB.prepare('SELECT r2_key FROM gallery_items WHERE id = ?').bind(id).first<{ r2_key: string }>();
+  if (row) await env.LNAPAGES_GALLERY.delete(row.r2_key);
+  await env.LNAPAGES_DB.prepare('DELETE FROM gallery_items WHERE id = ?').bind(id).run();
   return ok({ id });
 };

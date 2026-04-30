@@ -85,7 +85,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     sql += ' ORDER BY last_activity_at DESC LIMIT ?';
     bindings.push(limit);
 
-    const { results } = await context.env.FNLSTG_DB
+    const { results } = await context.env.LNAPAGES_DB
       .prepare(sql)
       .bind(...bindings)
       .all<ContactRow>();
@@ -112,13 +112,13 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     // Dedup: look for an existing contact by email or phone.
     let existing: ContactRow | null = null;
     if (emailLower) {
-      existing = await context.env.FNLSTG_DB
+      existing = await context.env.LNAPAGES_DB
         .prepare('SELECT * FROM contacts WHERE email_lower = ?')
         .bind(emailLower)
         .first<ContactRow>();
     }
     if (!existing && phoneE164) {
-      existing = await context.env.FNLSTG_DB
+      existing = await context.env.LNAPAGES_DB
         .prepare('SELECT * FROM contacts WHERE phone_e164 = ?')
         .bind(phoneE164)
         .first<ContactRow>();
@@ -126,7 +126,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
     if (existing) {
       // Merge: update non-null incoming fields onto the existing record.
-      await context.env.FNLSTG_DB
+      await context.env.LNAPAGES_DB
         .prepare(`UPDATE contacts SET
           name             = COALESCE(?, name),
           email            = COALESCE(?, email),
@@ -150,7 +150,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         )
         .run();
 
-      const updated = await context.env.FNLSTG_DB
+      const updated = await context.env.LNAPAGES_DB
         .prepare('SELECT * FROM contacts WHERE id = ?')
         .bind(existing.id)
         .first<ContactRow>();
@@ -158,7 +158,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     }
 
     // Insert new contact.
-    const result = await context.env.FNLSTG_DB
+    const result = await context.env.LNAPAGES_DB
       .prepare(`INSERT INTO contacts
         (name, email, email_lower, phone, phone_e164, source, stage, tags_json, notes)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`)
@@ -175,7 +175,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       )
       .run();
 
-    const created = await context.env.FNLSTG_DB
+    const created = await context.env.LNAPAGES_DB
       .prepare('SELECT * FROM contacts WHERE id = ?')
       .bind(Number(result.meta.last_row_id ?? 0))
       .first<ContactRow>();

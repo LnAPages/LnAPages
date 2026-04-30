@@ -13,7 +13,7 @@ function slugify(input: string): string {
 // GET /api/gallery/tags - list all tags (public, used by the filter UI).
 export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
     try {
-          const { results } = await env.FNLSTG_DB.prepare(
+          const { results } = await env.LNAPAGES_DB.prepare(
                   `SELECT tag, COUNT(*) AS count
                      FROM gallery_item_tags
                     GROUP BY tag
@@ -57,7 +57,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
           const slug = slugify(rawSlug || name);
 
       try {
-              const result = await env.FNLSTG_DB.prepare(
+              const result = await env.LNAPAGES_DB.prepare(
                         `INSERT INTO tags (name, slug, created_at)
                                  VALUES (?, ?, datetime('now'))`,
                       )

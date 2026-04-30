@@ -11,7 +11,7 @@ import {
 export const onRequestGet: PagesFunction<Env> = async (context) => {
     try {
           await requireAdmin(context);
-          const { results } = await context.env.FNLSTG_DB
+          const { results } = await context.env.LNAPAGES_DB
             .prepare(
                       `SELECT i.*,
                                       c.id   AS contact_id_join,
@@ -36,7 +36,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
 
       // If an item_id is provided, make sure it points to a real item.
       if (payload.item_id != null) {
-              const exists = await env.FNLSTG_DB
+              const exists = await env.LNAPAGES_DB
                 .prepare('SELECT id FROM items WHERE id = ?')
                 .bind(payload.item_id)
                 .first();
@@ -49,7 +49,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
       const emailLower = normalizeEmail(payload.email);
           const phoneE164 = normalizePhoneE164(payload.phone);
           if (emailLower || phoneE164) {
-                  const dup = await env.FNLSTG_DB
+                  const dup = await env.LNAPAGES_DB
                     .prepare(
                                 `SELECT i.*
                                              FROM intakes i
@@ -67,14 +67,14 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
           }
 
       // Look up an existing Contact by email/phone, or create a new one.
-      const { contact, created } = await findOrCreateContact(env.FNLSTG_DB, {
+      const { contact, created } = await findOrCreateContact(env.LNAPAGES_DB, {
               name: payload.name,
               email: payload.email,
               phone: payload.phone,
               source: 'intake',
       });
 
-      const result = await env.FNLSTG_DB
+      const result = await env.LNAPAGES_DB
             .prepare(
                       `INSERT INTO intakes (
                                  item_id, contact_id, name, email, phone, project_type, budget, timeline, message,

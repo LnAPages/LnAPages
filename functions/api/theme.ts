@@ -171,7 +171,7 @@ function coerceTheme(input: unknown): ThemeResult {
 }
 
 export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
-  const raw = await env.FNLSTG_CONFIG.get(THEME_KEY, 'json');
+  const raw = await env.LNAPAGES_CONFIG.get(THEME_KEY, 'json');
   const payload = raw && typeof raw === 'object' ? raw as Record<string, unknown> : {};
   const version = payload.version;
   if (version === 2) return ok(coerceTheme(payload));

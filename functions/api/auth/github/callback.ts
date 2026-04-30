@@ -25,9 +25,9 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, request }) => {
   });
 
   const stateKey = `${OAUTH_STATE_PREFIX}${state}`;
-  const stateValue = await env.FNLSTG_CONFIG.get(stateKey);
+  const stateValue = await env.LNAPAGES_CONFIG.get(stateKey);
   if (!stateValue) throw new HttpError(401, 'INVALID_STATE', 'OAuth state is invalid or expired');
-  await env.FNLSTG_CONFIG.delete(stateKey);
+  await env.LNAPAGES_CONFIG.delete(stateKey);
 
   const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
     method: 'POST',
@@ -50,7 +50,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, request }) => {
     headers: {
       Accept: 'application/vnd.github+json',
       Authorization: `Bearer ${tokenPayload.access_token}`,
-      'User-Agent': 'FNLSTG',
+      'User-Agent': 'LNAPAGES',
     },
   });
   const githubUser = (await userResponse.json()) as GitHubUserResponse;
@@ -62,17 +62,17 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, request }) => {
   }
 
   const email = `github+${username}@internal.fnlstage.com`;
-  const existing = await env.FNLSTG_DB.prepare('SELECT id FROM admin_users WHERE email = ?').bind(email).first<{ id: number }>();
+  const existing = await env.LNAPAGES_DB.prepare('SELECT id FROM admin_users WHERE email = ?').bind(email).first<{ id: number }>();
   let userId = existing?.id ?? 0;
   if (!userId) {
-    const result = await env.FNLSTG_DB.prepare("INSERT INTO admin_users (email, name, created_at) VALUES (?, ?, datetime('now'))")
+    const result = await env.LNAPAGES_DB.prepare("INSERT INTO admin_users (email, name, created_at) VALUES (?, ?, datetime('now'))")
       .bind(email, githubUser.name?.trim() || username)
       .run();
     userId = Number(result.meta.last_row_id ?? 0);
   }
 
   const token = crypto.randomUUID();
-  await env.FNLSTG_DB.prepare(`INSERT INTO admin_sessions (user_id, token, expires_at, created_at)
+  await env.LNAPAGES_DB.prepare(`INSERT INTO admin_sessions (user_id, token, expires_at, created_at)
                                VALUES (?, ?, datetime('now', '+30 days'), datetime('now'))`)
     .bind(userId, token)
     .run();

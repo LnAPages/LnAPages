@@ -19,7 +19,7 @@ export const onRequestPatch: PagesFunction<Env> = async (context) => {
 
   const body = await parseJson(request, schema);
 
-  await env.FNLSTG_DB
+  await env.LNAPAGES_DB
     .prepare(
       `UPDATE task_items SET
          done = ?,
@@ -31,7 +31,7 @@ export const onRequestPatch: PagesFunction<Env> = async (context) => {
     .bind(body.done ? 1 : 0, user.id, body.done ? 1 : 0, body.notes ?? null, itemId, taskId)
     .run();
 
-  await writeAuditLog(env.FNLSTG_DB, body.done ? 'task_item.done' : 'task_item.undone', {
+  await writeAuditLog(env.LNAPAGES_DB, body.done ? 'task_item.done' : 'task_item.undone', {
     userId: user.id,
     resourceType: 'task_item',
     resourceId: String(itemId),

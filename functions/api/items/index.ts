@@ -112,7 +112,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       (where.length ? ' WHERE ' + where.join(' AND ') : '') +
       ' ORDER BY sort_order ASC, id ASC';
 
-    const { results } = await context.env.FNLSTG_DB.prepare(sql)
+    const { results } = await context.env.LNAPAGES_DB.prepare(sql)
       .bind(...binds)
       .all<ItemRow>();
 
@@ -149,7 +149,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
     // Guard: add-ons must reference an existing item.
     if (body.addonOfItemId != null) {
-      const parent = await context.env.FNLSTG_DB.prepare(
+      const parent = await context.env.LNAPAGES_DB.prepare(
         'SELECT id FROM items WHERE id = ?',
       )
         .bind(body.addonOfItemId)
@@ -161,7 +161,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
     const now = new Date().toISOString();
 
-    const insert = await context.env.FNLSTG_DB.prepare(
+    const insert = await context.env.LNAPAGES_DB.prepare(
       `INSERT INTO items (
         type, slug, name, description,
         billing_mode, duration_minutes, price_cents, deposit_cents,
@@ -193,7 +193,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       return fail(409, 'slug_conflict', 'An item with that slug already exists');
     }
 
-    const created = await context.env.FNLSTG_DB.prepare(
+    const created = await context.env.LNAPAGES_DB.prepare(
       'SELECT * FROM items WHERE id = ?',
     )
       .bind(insert.meta.last_row_id)

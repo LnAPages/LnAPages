@@ -27,7 +27,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
   let bookingRows: BookingStatRow[] = [];
   try {
-    const query = await env.FNLSTG_DB.prepare(
+    const query = await env.LNAPAGES_DB.prepare(
       `SELECT
          b.created_at,
          b.start_time,
@@ -45,7 +45,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
   let orderRows: OrderStatRow[] = [];
   try {
-    const query = await env.FNLSTG_DB.prepare(
+    const query = await env.LNAPAGES_DB.prepare(
       `SELECT o.created_at, COALESCE(p.price_cents, 0) AS revenue_cents
        FROM orders o
        LEFT JOIN products p ON p.id = o.product_id
@@ -58,7 +58,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
   let galleryRows: GalleryStatRow[] = [];
   try {
-    const query = await env.FNLSTG_DB.prepare(
+    const query = await env.LNAPAGES_DB.prepare(
       `SELECT id, title, r2_key, sort_order
        FROM gallery_items
        ORDER BY sort_order ASC, id DESC

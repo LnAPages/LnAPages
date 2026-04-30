@@ -13,13 +13,13 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, params }) => {
   const id = idSchema.parse(params.id);
   let row = null;
   try {
-    row = await env.FNLSTG_DB.prepare(
+    row = await env.LNAPAGES_DB.prepare(
       `SELECT id, slug, name, description, duration_minutes, price_cents, active, sort_order, category, created_at, updated_at
        FROM items WHERE id = ? AND type IN (${SERVICE_TYPES})`,
     ).bind(id).first();
   } catch (error) {
     if (!isMissingCategoryColumnError(error)) throw error;
-    const fallback = await env.FNLSTG_DB.prepare(
+    const fallback = await env.LNAPAGES_DB.prepare(
       `SELECT id, slug, name, description, duration_minutes, price_cents, active, sort_order, created_at, updated_at
        FROM items WHERE id = ? AND type IN (${SERVICE_TYPES})`,
     ).bind(id).first<Record<string, unknown>>();
@@ -36,7 +36,7 @@ export const onRequestPatch: PagesFunction<Env> = async (context) => {
   const id = idSchema.parse(params.id);
   const payload = await parseJson(request, serviceUpdateSchema);
   try {
-    await env.FNLSTG_DB.prepare(
+    await env.LNAPAGES_DB.prepare(
       `UPDATE items
        SET slug = COALESCE(?, slug),
            name = COALESCE(?, name),
@@ -63,7 +63,7 @@ export const onRequestPatch: PagesFunction<Env> = async (context) => {
       .run();
   } catch (error) {
     if (!isMissingCategoryColumnError(error)) throw error;
-    await env.FNLSTG_DB.prepare(
+    await env.LNAPAGES_DB.prepare(
       `UPDATE items
        SET slug = COALESCE(?, slug),
            name = COALESCE(?, name),
@@ -89,13 +89,13 @@ export const onRequestPatch: PagesFunction<Env> = async (context) => {
   }
   let updated = null;
   try {
-    updated = await env.FNLSTG_DB.prepare(
+    updated = await env.LNAPAGES_DB.prepare(
       `SELECT id, slug, name, description, duration_minutes, price_cents, active, sort_order, category, created_at, updated_at
        FROM items WHERE id = ? AND type IN (${SERVICE_TYPES})`,
     ).bind(id).first();
   } catch (error) {
     if (!isMissingCategoryColumnError(error)) throw error;
-    const fallback = await env.FNLSTG_DB.prepare(
+    const fallback = await env.LNAPAGES_DB.prepare(
       `SELECT id, slug, name, description, duration_minutes, price_cents, active, sort_order, created_at, updated_at
        FROM items WHERE id = ? AND type IN (${SERVICE_TYPES})`,
     ).bind(id).first<Record<string, unknown>>();
@@ -110,7 +110,7 @@ export const onRequestDelete: PagesFunction<Env> = async (context) => {
   await requireAdmin(context);
   const { env, params } = context;
   const id = idSchema.parse(params.id);
-  const result = await env.FNLSTG_DB.prepare(
+  const result = await env.LNAPAGES_DB.prepare(
     `DELETE FROM items WHERE id = ? AND type IN (${SERVICE_TYPES})`,
   ).bind(id).run();
   if (!result.meta.changes) throw new HttpError(404, 'NOT_FOUND', 'Service not found');

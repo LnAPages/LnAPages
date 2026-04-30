@@ -15,13 +15,13 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     const id = idSchema.parse(context.params.id);
 
     // Check contact exists.
-    const contact = await context.env.FNLSTG_DB
+    const contact = await context.env.LNAPAGES_DB
       .prepare('SELECT id, name, email, phone FROM contacts WHERE id = ?')
       .bind(id)
       .first<{ id: number; name: string; email: string | null; phone: string | null }>();
     if (!contact) return fail(404, 'NOT_FOUND', 'Contact not found');
 
-    const db = context.env.FNLSTG_DB;
+    const db = context.env.LNAPAGES_DB;
 
     // 1. Intakes linked by FK.
     const { results: intakes } = await db

@@ -40,7 +40,7 @@ function priceForItem(item: ItemRow, hoursRequested: number | null | undefined):
 export const onRequestGet: PagesFunction<Env> = async (context) => {
   try {
     await requireAdmin(context);
-    const { results } = await context.env.FNLSTG_DB
+    const { results } = await context.env.LNAPAGES_DB
       .prepare('SELECT * FROM bookings ORDER BY start_time DESC')
       .all();
     return ok(results);
@@ -56,7 +56,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
     const payload = await parseJson(request, bookingCreateSchema);
 
     // 1. Load the primary item.
-    const item = await env.FNLSTG_DB
+    const item = await env.LNAPAGES_DB
       .prepare('SELECT id, type, slug, name, billing_mode, duration_minutes, price_cents, deposit_cents, active FROM items WHERE id = ?')
       .bind(payload.item_id)
       .first<ItemRow>();
@@ -81,7 +81,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
     let addonTotal = 0;
     if (addonIds.length > 0) {
       const placeholders = addonIds.map(() => '?').join(',');
-      const { results: addons } = await env.FNLSTG_DB
+      const { results: addons } = await env.LNAPAGES_DB
         .prepare(`SELECT id, price_cents, active FROM items WHERE id IN (${placeholders})`)
         .bind(...addonIds)
         .all<{ id: number; price_cents: number; active: number }>();
@@ -114,7 +114,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
     const status = 'pending';
     const addonJson = JSON.stringify(addonIds);
 
-    const result = await env.FNLSTG_DB
+    const result = await env.LNAPAGES_DB
       .prepare(
         `INSERT INTO bookings (
           item_id, customer_name, customer_email, customer_phone,

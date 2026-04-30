@@ -37,7 +37,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   if (status) { query += ' AND t.status = ?'; binds.push(status); }
   query += ' ORDER BY t.created_at DESC';
 
-  const rows = await context.env.FNLSTG_DB.prepare(query).bind(...binds).all();
+  const rows = await context.env.LNAPAGES_DB.prepare(query).bind(...binds).all();
   return ok(rows.results);
 };
 
@@ -48,7 +48,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
   const body = await parseJson(request, createSchema);
 
-  const result = await env.FNLSTG_DB
+  const result = await env.LNAPAGES_DB
     .prepare(
       `INSERT INTO tasks (template_id, subject_type, subject_id, assignee_id, title, status, due_at, created_by, created_at)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
@@ -69,29 +69,29 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
   // If template_id is provided, clone items from template
   if (body.template_id) {
-    const templateItems = await env.FNLSTG_DB
+    const templateItems = await env.LNAPAGES_DB
       .prepare(`SELECT position, title, hint FROM task_template_items WHERE template_id = ? ORDER BY position`)
       .bind(body.template_id)
       .all<{ position: number; title: string; hint: string | null }>();
 
     if (templateItems.results.length > 0) {
       const stmts = templateItems.results.map((item: { position: number; title: string; hint: string | null }) =>
-        env.FNLSTG_DB
+        env.LNAPAGES_DB
           .prepare(`INSERT INTO task_items (task_id, position, title) VALUES (?, ?, ?)`)
           .bind(taskId, item.position, item.title),
       );
-      await env.FNLSTG_DB.batch(stmts);
+      await env.LNAPAGES_DB.batch(stmts);
     }
   } else if (body.items && body.items.length > 0) {
     const stmts = body.items.map((item) =>
-      env.FNLSTG_DB
+      env.LNAPAGES_DB
         .prepare(`INSERT INTO task_items (task_id, position, title) VALUES (?, ?, ?)`)
         .bind(taskId, item.position, item.title),
     );
-    await env.FNLSTG_DB.batch(stmts);
+    await env.LNAPAGES_DB.batch(stmts);
   }
 
-  await writeAuditLog(env.FNLSTG_DB, 'task.create', {
+  await writeAuditLog(env.LNAPAGES_DB, 'task.create', {
     userId: user.id,
     resourceType: 'task',
     resourceId: String(taskId),

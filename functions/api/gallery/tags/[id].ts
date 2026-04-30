@@ -62,7 +62,7 @@ export const onRequestPatch: PagesFunction<Env> = async (context) => {
           binds.push(id);
 
       try {
-              const result = await env.FNLSTG_DB.prepare(
+              const result = await env.LNAPAGES_DB.prepare(
                         `UPDATE tags SET ${sets.join(', ')} WHERE id = ?`,
                       )
                 .bind(...binds)
@@ -77,7 +77,7 @@ export const onRequestPatch: PagesFunction<Env> = async (context) => {
               throw err;
       }
 
-      const row = await env.FNLSTG_DB.prepare(
+      const row = await env.LNAPAGES_DB.prepare(
               'SELECT id, name, slug, created_at FROM tags WHERE id = ?',
             )
             .bind(id)
@@ -105,16 +105,16 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
           }
 
       // Verify both rows exist to produce a clean 404 rather than an FK error.
-      const tag = await env.FNLSTG_DB.prepare('SELECT id FROM tags WHERE id = ?')
+      const tag = await env.LNAPAGES_DB.prepare('SELECT id FROM tags WHERE id = ?')
             .bind(tagId)
             .first();
           if (!tag) return fail(404, 'TAG_NOT_FOUND', 'Tag not found');
-          const item = await env.FNLSTG_DB.prepare('SELECT id FROM gallery_items WHERE id = ?')
+          const item = await env.LNAPAGES_DB.prepare('SELECT id FROM gallery_items WHERE id = ?')
             .bind(itemId)
             .first();
           if (!item) return fail(404, 'ITEM_NOT_FOUND', 'Gallery item not found');
 
-      await env.FNLSTG_DB.prepare(
+      await env.LNAPAGES_DB.prepare(
               `INSERT OR IGNORE INTO gallery_tags (gallery_item_id, tag_id) VALUES (?, ?)`,
             )
             .bind(itemId, tagId)
@@ -141,7 +141,7 @@ export const onRequestDelete: PagesFunction<Env> = async (context) => {
           const itemId = parseItemId(request);
 
       if (itemId !== null) {
-              const result = await env.FNLSTG_DB.prepare(
+              const result = await env.LNAPAGES_DB.prepare(
                         `DELETE FROM gallery_tags WHERE tag_id = ? AND gallery_item_id = ?`,
                       )
                 .bind(tagId, itemId)
@@ -150,7 +150,7 @@ export const onRequestDelete: PagesFunction<Env> = async (context) => {
               return ok({ detached: changes > 0, itemId, tagId });
       }
 
-      const result = await env.FNLSTG_DB.prepare('DELETE FROM tags WHERE id = ?')
+      const result = await env.LNAPAGES_DB.prepare('DELETE FROM tags WHERE id = ?')
             .bind(tagId)
             .run();
           const changes = Number(result.meta.changes ?? 0);

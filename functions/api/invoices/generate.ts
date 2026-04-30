@@ -7,7 +7,7 @@ const schema = z.object({ booking_id: z.number().int().positive() });
 
 export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
   const { booking_id } = schema.parse(await request.json());
-  const booking = await env.FNLSTG_DB.prepare('SELECT * FROM bookings WHERE id = ?').bind(booking_id).first<{ id: number; customer_name: string; customer_email: string; amount_cents: number; start_time: string }>();
+  const booking = await env.LNAPAGES_DB.prepare('SELECT * FROM bookings WHERE id = ?').bind(booking_id).first<{ id: number; customer_name: string; customer_email: string; amount_cents: number; start_time: string }>();
   if (!booking) throw new HttpError(404, 'NOT_FOUND', 'Booking not found');
 
   const pdf = await PDFDocument.create();
@@ -23,8 +23,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
 
   const number = `INV-${new Date().getUTCFullYear()}-${booking.id}`;
   const key = `invoices/${number}.pdf`;
-  await env.FNLSTG_GALLERY.put(key, bytes, { httpMetadata: { contentType: 'application/pdf' } });
-  await env.FNLSTG_DB.prepare(
+  await env.LNAPAGES_GALLERY.put(key, bytes, { httpMetadata: { contentType: 'application/pdf' } });
+  await env.LNAPAGES_DB.prepare(
     `INSERT INTO invoices (booking_id, number, r2_key, amount_cents, issued_at)
      VALUES (?, ?, ?, ?, datetime('now'))`,
   ).bind(booking.id, number, key, booking.amount_cents).run();

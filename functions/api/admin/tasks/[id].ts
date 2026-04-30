@@ -16,7 +16,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   const id = Number(context.params['id']);
   if (!id) throw new HttpError(400, 'BAD_REQUEST', 'Invalid id');
 
-  const task = await context.env.FNLSTG_DB
+  const task = await context.env.LNAPAGES_DB
     .prepare(
       `SELECT t.*, u.name as assignee_name
        FROM tasks t LEFT JOIN admin_users u ON t.assignee_id = u.id
@@ -26,7 +26,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     .first();
   if (!task) throw new HttpError(404, 'NOT_FOUND', 'Task not found');
 
-  const items = await context.env.FNLSTG_DB
+  const items = await context.env.LNAPAGES_DB
     .prepare(`SELECT ti.*, u.name as done_by_name FROM task_items ti LEFT JOIN admin_users u ON ti.done_by = u.id WHERE ti.task_id = ? ORDER BY ti.position`)
     .bind(id)
     .all();
@@ -60,12 +60,12 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
   if (setClauses.length === 0) throw new HttpError(400, 'BAD_REQUEST', 'Nothing to update');
   binds.push(id);
 
-  await env.FNLSTG_DB
+  await env.LNAPAGES_DB
     .prepare(`UPDATE tasks SET ${setClauses.join(', ')} WHERE id = ?`)
     .bind(...binds)
     .run();
 
-  await writeAuditLog(env.FNLSTG_DB, 'task.update', {
+  await writeAuditLog(env.LNAPAGES_DB, 'task.update', {
     userId: user.id,
     resourceType: 'task',
     resourceId: String(id),

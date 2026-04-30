@@ -31,10 +31,10 @@ const deleteSchema = z.object({
 
 async function readServiceSlugs(env: Env): Promise<Set<string>> {
   try {
-    const { results } = await env.FNLSTG_DB.prepare(`SELECT slug FROM items WHERE type IN ('service','bundle')`).all<{ slug: string }>();
+    const { results } = await env.LNAPAGES_DB.prepare(`SELECT slug FROM items WHERE type IN ('service','bundle')`).all<{ slug: string }>();
     return new Set(results.map((row: { slug: string }) => String(row.slug).trim()).filter(Boolean));
   } catch {
-    const { results } = await env.FNLSTG_DB.prepare('SELECT slug FROM services').all<{ slug: string }>();
+    const { results } = await env.LNAPAGES_DB.prepare('SELECT slug FROM services').all<{ slug: string }>();
     return new Set(results.map((row: { slug: string }) => String(row.slug).trim()).filter(Boolean));
   }
 }

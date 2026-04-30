@@ -9,7 +9,7 @@ const idSchema = z.coerce.number().int().positive();
 export const onRequestGet: PagesFunction<Env> = async (context) => {
   await requireAdmin(context);
   const id = idSchema.parse(context.params.id);
-  const row = await context.env.FNLSTG_DB
+  const row = await context.env.LNAPAGES_DB
     .prepare('SELECT * FROM bookings WHERE id = ?')
     .bind(id)
     .first();
@@ -27,7 +27,7 @@ export const onRequestPatch: PagesFunction<Env> = async (context) => {
   const depositPaid =
     payload.deposit_paid !== undefined ? (payload.deposit_paid ? 1 : 0) : null;
 
-  await context.env.FNLSTG_DB
+  await context.env.LNAPAGES_DB
     .prepare(
       `UPDATE bookings
          SET item_id               = COALESCE(?, item_id),
@@ -66,7 +66,7 @@ export const onRequestPatch: PagesFunction<Env> = async (context) => {
     )
     .run();
 
-  const updated = await context.env.FNLSTG_DB
+  const updated = await context.env.LNAPAGES_DB
     .prepare('SELECT * FROM bookings WHERE id = ?')
     .bind(id)
     .first();
@@ -76,7 +76,7 @@ export const onRequestPatch: PagesFunction<Env> = async (context) => {
 export const onRequestDelete: PagesFunction<Env> = async (context) => {
   await requireAdmin(context);
   const id = idSchema.parse(context.params.id);
-  await context.env.FNLSTG_DB
+  await context.env.LNAPAGES_DB
     .prepare('DELETE FROM bookings WHERE id = ?')
     .bind(id)
     .run();

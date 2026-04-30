@@ -31,7 +31,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   const key = `gallery/${crypto.randomUUID()}.${extFromName(payload.filename, fallbackExt)}`;
   const contentType = (payload.contentType ?? '').trim() || (kind === 'video' ? 'video/mp4' : 'image/jpeg');
 
-  const bucket = context.env.FNLSTG_GALLERY as PresignableR2Bucket;
+  const bucket = context.env.LNAPAGES_GALLERY as PresignableR2Bucket;
   if (typeof bucket.createPresignedUrl !== 'function') {
     return fail(500, 'PRESIGN_UNAVAILABLE', 'R2 presign is not available in this runtime');
   }

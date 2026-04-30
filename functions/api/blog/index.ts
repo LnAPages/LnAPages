@@ -5,7 +5,7 @@ import type { Env } from '../../lib/types';
 const KV_KEY = 'blog-posts';
 
 export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
-  const raw = await env.FNLSTG_CONFIG.get(KV_KEY, 'json');
+  const raw = await env.LNAPAGES_CONFIG.get(KV_KEY, 'json');
   const parsed = blogStateSchema.safeParse(raw);
   const posts = parsed.success ? parsed.data.posts : [];
   const published = posts

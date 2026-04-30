@@ -27,18 +27,18 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
   const tokenHash = await hashToken(body.token);
   const kvKey = `pwd_reset:${tokenHash}`;
-  const stored = await env.FNLSTG_CONFIG.get(kvKey);
+  const stored = await env.LNAPAGES_CONFIG.get(kvKey);
   if (!stored) throw new HttpError(400, 'INVALID_TOKEN', 'Reset token is invalid or has expired');
 
   const payload = JSON.parse(stored) as ResetPayload;
   if (new Date(payload.expiresAt) < new Date()) {
-    await env.FNLSTG_CONFIG.delete(kvKey);
+    await env.LNAPAGES_CONFIG.delete(kvKey);
     throw new HttpError(400, 'TOKEN_EXPIRED', 'Reset token has expired');
   }
 
   const { hash, salt, algo } = await hashPassword(body.password);
 
-  await env.FNLSTG_DB
+  await env.LNAPAGES_DB
     .prepare(
       `UPDATE admin_users
        SET password_hash = ?, password_salt = ?, password_algo = ?,
@@ -49,14 +49,14 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     .run();
 
   // Revoke all sessions on password change
-  await env.FNLSTG_DB
+  await env.LNAPAGES_DB
     .prepare(`UPDATE admin_sessions SET revoked_at = datetime('now') WHERE user_id = ? AND revoked_at IS NULL`)
     .bind(payload.userId)
     .run();
 
-  await env.FNLSTG_CONFIG.delete(kvKey);
+  await env.LNAPAGES_CONFIG.delete(kvKey);
 
-  await writeAuditLog(env.FNLSTG_DB, 'auth.password_reset', {
+  await writeAuditLog(env.LNAPAGES_DB, 'auth.password_reset', {
     userId: payload.userId,
     ip,
     ua,

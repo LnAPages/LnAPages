@@ -12,13 +12,13 @@ const schema = z.object({
 });
 
 export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
-  const row = await env.FNLSTG_DB.prepare('SELECT * FROM notification_prefs WHERE id = 1').first();
+  const row = await env.LNAPAGES_DB.prepare('SELECT * FROM notification_prefs WHERE id = 1').first();
   return ok(row);
 };
 
 export const onRequestPut: PagesFunction<Env> = async ({ env, request }) => {
   const payload = schema.parse(await request.json());
-  await env.FNLSTG_DB.prepare(
+  await env.LNAPAGES_DB.prepare(
     `INSERT INTO notification_prefs (id, admin_email, admin_phone, channel, notify_on_booking, notify_on_payment, notify_on_intake, updated_at)
      VALUES (1, ?, ?, ?, ?, ?, ?, datetime('now'))
      ON CONFLICT(id) DO UPDATE SET

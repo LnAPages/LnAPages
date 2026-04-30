@@ -37,7 +37,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       return fail(400, 'SAME_CONTACT', 'keep_id and merge_id must be different');
     }
 
-    const db = context.env.FNLSTG_DB;
+    const db = context.env.LNAPAGES_DB;
 
     const [keep, merging] = await Promise.all([
       db.prepare('SELECT * FROM contacts WHERE id = ?').bind(keep_id).first<ContactRow>(),

@@ -22,10 +22,10 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   }
 
   const body = await parseJson(context.request, testEmailSchema);
-  const subject = body.subject ?? 'FNLSTG Resend test';
+  const subject = body.subject ?? 'LNAPAGES Resend test';
   const text =
     body.message ??
-    'This is a test email from your FNLSTG admin panel. If you received this, Resend is wired up correctly.';
+    'This is a test email from your LNAPAGES admin panel. If you received this, Resend is wired up correctly.';
 
   const resendResponse = await fetch('https://api.resend.com/emails', {
     method: 'POST',

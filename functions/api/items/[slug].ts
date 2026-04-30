@@ -95,7 +95,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     const slug = getSlugParam(context);
     if (!slug) return fail(400, 'bad_request', 'Missing slug');
 
-    const row = await context.env.FNLSTG_DB.prepare(
+    const row = await context.env.LNAPAGES_DB.prepare(
       'SELECT * FROM items WHERE slug = ? AND active = 1',
     )
       .bind(slug)
@@ -129,7 +129,7 @@ export const onRequestPatch: PagesFunction<Env> = async (context) => {
 
     const body = await parseJson(context.request, UpdateItemSchema);
 
-    const existing = await context.env.FNLSTG_DB.prepare(
+    const existing = await context.env.LNAPAGES_DB.prepare(
       'SELECT * FROM items WHERE slug = ?',
     )
       .bind(slug)
@@ -148,7 +148,7 @@ export const onRequestPatch: PagesFunction<Env> = async (context) => {
       if (body.addonOfItemId === existing.id) {
         return fail(400, 'invalid_addon', 'An item cannot be an add-on of itself');
       }
-      const parent = await context.env.FNLSTG_DB.prepare(
+      const parent = await context.env.LNAPAGES_DB.prepare(
         'SELECT id FROM items WHERE id = ?',
       )
         .bind(body.addonOfItemId)
@@ -193,12 +193,12 @@ export const onRequestPatch: PagesFunction<Env> = async (context) => {
     const sql = 'UPDATE items SET ' + fields.join(', ') + ' WHERE id = ?';
     binds.push(existing.id);
 
-    const result = await context.env.FNLSTG_DB.prepare(sql).bind(...binds).run();
+    const result = await context.env.LNAPAGES_DB.prepare(sql).bind(...binds).run();
     if (!result.success) {
       return fail(409, 'slug_conflict', 'Update failed (likely a slug collision)');
     }
 
-    const updated = await context.env.FNLSTG_DB.prepare(
+    const updated = await context.env.LNAPAGES_DB.prepare(
       'SELECT * FROM items WHERE id = ?',
     )
       .bind(existing.id)
@@ -233,7 +233,7 @@ export const onRequestDelete: PagesFunction<Env> = async (context) => {
     const url = new URL(context.request.url);
     const hard = url.searchParams.get('hard') === '1';
 
-    const existing = await context.env.FNLSTG_DB.prepare(
+    const existing = await context.env.LNAPAGES_DB.prepare(
       'SELECT * FROM items WHERE slug = ?',
     )
       .bind(slug)
@@ -242,7 +242,7 @@ export const onRequestDelete: PagesFunction<Env> = async (context) => {
     if (!existing) return fail(404, 'not_found', 'Item not found');
 
     if (hard) {
-      const bookingCount = await context.env.FNLSTG_DB.prepare(
+      const bookingCount = await context.env.LNAPAGES_DB.prepare(
         'SELECT COUNT(*) as n FROM bookings WHERE item_id = ?',
       )
         .bind(existing.id)
@@ -254,11 +254,11 @@ export const onRequestDelete: PagesFunction<Env> = async (context) => {
           'Cannot hard-delete an item that has bookings. Soft-disable instead (active=false).',
         );
       }
-      await context.env.FNLSTG_DB.prepare('DELETE FROM items WHERE id = ?')
+      await context.env.LNAPAGES_DB.prepare('DELETE FROM items WHERE id = ?')
         .bind(existing.id)
         .run();
     } else {
-      await context.env.FNLSTG_DB.prepare(
+      await context.env.LNAPAGES_DB.prepare(
         "UPDATE items SET active = 0, updated_at = datetime('now') WHERE id = ?",
       )
         .bind(existing.id)
