@@ -84,7 +84,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   let r2Items: Array<Record<string, unknown>> = [];
   if (includeR2) {
     try {
-      const { results } = await env.FNLSTG_DB.prepare(
+      const { results } = await env.LNAPAGES_DB.prepare(
         `SELECT gi.*,
                 COALESCE(
                   (SELECT json_group_array(git.tag)
@@ -101,7 +101,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
         return { ...mapped, selected: selectionOverrides[key] ?? true };
       });
     } catch {
-      const { results } = await env.FNLSTG_DB.prepare('SELECT * FROM gallery_items ORDER BY sort_order, id').all<Record<string, unknown>>();
+      const { results } = await env.LNAPAGES_DB.prepare('SELECT * FROM gallery_items ORDER BY sort_order, id').all<Record<string, unknown>>();
       r2Items = results.map((row: Record<string, unknown>) => {
         const mapped = mapGalleryRow(row, undefined, r2BaseUrl);
         const key = `r2:${String(row.id ?? '')}`;
