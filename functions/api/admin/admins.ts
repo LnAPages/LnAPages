@@ -21,7 +21,7 @@ export const onRequestPut: PagesFunction<Env> = async ({ env, request }) => {
   const normalized = normalizeUsernames(payload.usernames);
   const usernames = normalized.filter((username) => username !== repoOwner);
   const ignored = normalized.includes(repoOwner) ? [repoOwner] : [];
-  await env.FNLSTG_CONFIG.put(ADMIN_GITHUB_USERNAMES_KEY, JSON.stringify(usernames));
+  await env.LNAPAGES_CONFIG.put(ADMIN_GITHUB_USERNAMES_KEY, JSON.stringify(usernames));
   return ok({
     repoOwner,
     usernames,
