@@ -18,6 +18,6 @@ binding = "LNAPAGES_CONFIG"
 id = "e776936711fe4c91a9e31a89534732de"
 
 [vars]
-APP_URL = ""
+APP_URL = "https://lnapages.pages.dev"
 R2_PUBLIC_BASE_URL = ""
 GITHUB_REPO_OWNER = "LnAPages"
