@@ -95,14 +95,14 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
          FROM gallery_items gi
          ORDER BY gi.sort_order, gi.id`,
       ).all<Record<string, unknown>>();
-      r2Items = results.map((row) => {
+      r2Items = results.map((row: Record<string, unknown>) => {
         const mapped = mapGalleryRow(row, parseTagsJson(row.tags_json), r2BaseUrl);
         const key = `r2:${String(row.id ?? '')}`;
         return { ...mapped, selected: selectionOverrides[key] ?? true };
       });
     } catch {
       const { results } = await env.FNLSTG_DB.prepare('SELECT * FROM gallery_items ORDER BY sort_order, id').all<Record<string, unknown>>();
-      r2Items = results.map((row) => {
+      r2Items = results.map((row: Record<string, unknown>) => {
         const mapped = mapGalleryRow(row, undefined, r2BaseUrl);
         const key = `r2:${String(row.id ?? '')}`;
         return { ...mapped, selected: selectionOverrides[key] ?? true };
