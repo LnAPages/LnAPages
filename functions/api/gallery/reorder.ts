@@ -5,7 +5,7 @@ import type { Env } from '../../lib/types';
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   await requireAdmin(context);
   const payload = await parseJson(context.request, galleryReorderSchema);
-  const statements = payload.items.map((item) => context.env.FNLSTG_DB.prepare('UPDATE gallery_items SET sort_order = ? WHERE id = ?').bind(item.sort_order, item.id));
-  await context.env.FNLSTG_DB.batch(statements);
+  const statements = payload.items.map((item) => context.env.LNAPAGES_DB.prepare('UPDATE gallery_items SET sort_order = ? WHERE id = ?').bind(item.sort_order, item.id));
+  await context.env.LNAPAGES_DB.batch(statements);
   return ok({ updated: payload.items.length });
 };
