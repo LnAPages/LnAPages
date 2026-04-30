@@ -20,7 +20,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   const id = Number(context.params['id']);
   if (!id) throw new HttpError(400, 'BAD_REQUEST', 'Invalid id');
 
-  const expense = await context.env.FNLSTG_DB
+  const expense = await context.env.LNAPAGES_DB
     .prepare(
       `SELECT e.*, ec.name as category_name, ec.color as category_color
        FROM expenses e LEFT JOIN expense_categories ec ON e.category_id = ec.id
@@ -30,7 +30,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     .first();
   if (!expense) throw new HttpError(404, 'NOT_FOUND', 'Expense not found');
 
-  const attachments = await context.env.FNLSTG_DB
+  const attachments = await context.env.LNAPAGES_DB
     .prepare(`SELECT id, r2_key, mime_type, file_name, size_bytes, created_at FROM expense_attachments WHERE expense_id = ?`)
     .bind(id)
     .all();
@@ -68,9 +68,9 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
   }
   binds.push(id);
 
-  await env.FNLSTG_DB.prepare(`UPDATE expenses SET ${setClauses.join(', ')} WHERE id = ?`).bind(...binds).run();
+  await env.LNAPAGES_DB.prepare(`UPDATE expenses SET ${setClauses.join(', ')} WHERE id = ?`).bind(...binds).run();
 
-  await writeAuditLog(env.FNLSTG_DB, 'expense.update', {
+  await writeAuditLog(env.LNAPAGES_DB, 'expense.update', {
     userId: user.id,
     resourceType: 'expense',
     resourceId: String(id),
@@ -89,9 +89,9 @@ export const onRequestDelete: PagesFunction<Env> = async (context) => {
   const id = Number(context.params['id']);
   if (!id) throw new HttpError(400, 'BAD_REQUEST', 'Invalid id');
 
-  await env.FNLSTG_DB.prepare(`DELETE FROM expenses WHERE id = ?`).bind(id).run();
+  await env.LNAPAGES_DB.prepare(`DELETE FROM expenses WHERE id = ?`).bind(id).run();
 
-  await writeAuditLog(env.FNLSTG_DB, 'expense.delete', {
+  await writeAuditLog(env.LNAPAGES_DB, 'expense.delete', {
     userId: user.id,
     resourceType: 'expense',
     resourceId: String(id),
