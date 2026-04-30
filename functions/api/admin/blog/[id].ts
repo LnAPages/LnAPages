@@ -5,13 +5,13 @@ import type { Env } from '../../../lib/types';
 const KV_KEY = 'blog-posts';
 
 async function loadPosts(env: Env): Promise<BlogPost[]> {
-    const raw = await env.FNLSTG_CONFIG.get(KV_KEY, 'json');
+    const raw = await env.LNAPAGES_CONFIG.get(KV_KEY, 'json');
     const parsed = blogStateSchema.safeParse(raw);
     return parsed.success ? parsed.data.posts : [];
 }
 
 async function savePosts(env: Env, posts: BlogPost[]): Promise<void> {
-    await env.FNLSTG_CONFIG.put(KV_KEY, JSON.stringify({ posts }));
+    await env.LNAPAGES_CONFIG.put(KV_KEY, JSON.stringify({ posts }));
 }
 
 export const onRequestPut: PagesFunction<Env> = async (context) => {
