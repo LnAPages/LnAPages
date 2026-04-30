@@ -60,14 +60,14 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     };
 
     const events: ActivityEvent[] = [
-      ...(intakes ?? []).map((r) => ({
+      ...(intakes ?? []).map((r: any) => ({
         type: 'intake' as const,
         id: r.id,
         summary: `Intake – ${r.project_type}`,
         status: r.status,
         timestamp: r.created_at,
       })),
-      ...(bookings ?? []).map((r) => ({
+      ...(bookings ?? []).map((r: any) => ({
         type: 'booking' as const,
         id: r.id,
         summary: `Booking – ${r.start_time?.slice(0, 10) ?? ''}${r.amount_cents ? ` · $${(r.amount_cents / 100).toFixed(2)}` : ''}`,
