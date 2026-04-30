@@ -14,7 +14,7 @@ export const onRequestPatch: PagesFunction<Env> = async (context) => {
     return fail(400, 'BAD_ID', 'Invalid gallery item id');
   }
   const body = await parseJson(context.request, focalUpdateSchema);
-  const result = await context.env.FNLSTG_DB
+  const result = await context.env.LNAPAGES_DB
     .prepare('UPDATE gallery_items SET focal_x = ?, focal_y = ? WHERE id = ?')
     .bind(body.focal_x, body.focal_y, itemId)
     .run();
