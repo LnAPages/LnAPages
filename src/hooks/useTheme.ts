@@ -19,12 +19,12 @@ export function useTheme() {
         if (cancelled) return;
         const nextTheme = sanitizeTheme(remote);
         setThemeState(nextTheme);
-        applyTheme(nextTheme);
+        applyTheme(nextTheme);          document.documentElement.setAttribute('data-theme-ready', '');
       } catch (err) {
         if (cancelled) return;
         const message = err instanceof Error ? err.message : 'Failed to load theme';
         setError(message);
-        applyTheme(FINAL_STAGE_THEME);
+        // no fallback theme: keep body hidden until /theme succeeds
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -56,7 +56,7 @@ export function useTheme() {
 
   const resetTheme = useCallback(() => {
     setThemeState(FINAL_STAGE_THEME);
-    applyTheme(FINAL_STAGE_THEME);
+    // no fallback theme: keep body hidden until /theme succeeds
   }, []);
 
   return useMemo(
