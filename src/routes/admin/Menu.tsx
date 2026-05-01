@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { MenuLink } from '@/types';
+import type { MenuData, MenuLink } from '@/types';
+import { TALENTS } from '@/data/talents';
 import { api } from '@/lib/api';
 
 type DraftLink = MenuLink;
 
-const newId = () => `link-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+const newId = (prefix = 'link') => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
 /** Built-in public pages that can be toggled on/off in the hamburger menu
  *  with a single click. Custom links can still be added below. */
@@ -22,26 +23,40 @@ const BUILTIN_PAGES: { key: string; label: string; url: string }[] = [
 const builtinIdFor = (key: string) => `builtin:${key}`;
 const isBuiltinId = (id: string) => id.startsWith('builtin:');
 
+/** Derived from the canonical TALENTS list so the frontend and backend share the same defaults. */
+const DEFAULT_TALENTS: DraftLink[] = TALENTS.map((t, i) => ({
+  id: `talent-${t.slug}`,
+  label: t.label,
+  url: `/services?talent=${t.slug}`,
+  new_tab: false,
+  sort_order: i,
+}));
+
 export default function Menu() {
   const qc = useQueryClient();
-  const { data = [], isLoading } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['menu-admin'],
-    queryFn: () => api.get<MenuLink[]>('/menu'),
+    queryFn: () => api.get<MenuData>('/menu'),
   });
 
   const [draft, setDraft] = useState<DraftLink[]>([]);
+  const [talentDraft, setTalentDraft] = useState<DraftLink[]>([]);
   const [status, setStatus] = useState<string | null>(null);
 
   useEffect(() => {
-    setDraft([...data].sort((a, b) => a.sort_order - b.sort_order).map((l) => ({ ...l })));
+    if (!data) return;
+    setDraft([...(data.links ?? [])].sort((a, b) => a.sort_order - b.sort_order).map((l) => ({ ...l })));
+    const talents = data.talents && data.talents.length > 0 ? data.talents : DEFAULT_TALENTS;
+    setTalentDraft([...talents].sort((a, b) => a.sort_order - b.sort_order).map((l) => ({ ...l })));
   }, [data]);
 
   const save = useMutation({
-    mutationFn: (links: DraftLink[]) => api.put<MenuLink[]>('/menu', { links }),
+    mutationFn: (payload: { links: DraftLink[]; talents: DraftLink[] }) =>
+      api.put<MenuData>('/menu', payload),
     onSuccess: (saved) => {
       qc.setQueryData(['menu-admin'], saved);
       qc.invalidateQueries({ queryKey: ['menu'] });
-      setStatus('Saved. The customer hamburger now shows these links.');
+      setStatus('Saved. Changes are now live on the site.');
     },
     onError: (e: unknown) => {
       setStatus(`Save failed: ${e instanceof Error ? e.message : 'unknown error'}`);
@@ -54,10 +69,28 @@ export default function Menu() {
   const add = () =>
     setDraft((d) => [
       ...d,
-      { id: newId(), label: '', url: '/', new_tab: false, sort_order: d.length },
+      { id: newId('link'), label: '', url: '/', new_tab: false, sort_order: d.length },
     ]);
   const move = (idx: number, dir: -1 | 1) => {
     setDraft((d) => {
+      const next = [...d];
+      const target = idx + dir;
+      if (target < 0 || target >= next.length) return d;
+      [next[idx], next[target]] = [next[target], next[idx]];
+      return next.map((row, i) => ({ ...row, sort_order: i }));
+    });
+  };
+
+  const updateTalent = (idx: number, patch: Partial<DraftLink>) =>
+    setTalentDraft((d) => d.map((row, i) => (i === idx ? { ...row, ...patch } : row)));
+  const removeTalent = (idx: number) => setTalentDraft((d) => d.filter((_, i) => i !== idx));
+  const addTalent = () =>
+    setTalentDraft((d) => [
+      ...d,
+      { id: newId('talent'), label: '', url: '/services?talent=', new_tab: false, sort_order: d.length },
+    ]);
+  const moveTalent = (idx: number, dir: -1 | 1) => {
+    setTalentDraft((d) => {
       const next = [...d];
       const target = idx + dir;
       if (target < 0 || target >= next.length) return d;
@@ -92,10 +125,13 @@ export default function Menu() {
 
   const submit = () => {
     setStatus(null);
-    const cleaned = draft
+    const cleanedLinks = draft
       .map((row, i) => ({ ...row, sort_order: i }))
       .filter((row) => row.label.trim() && row.url.trim());
-    save.mutate(cleaned);
+    const cleanedTalents = talentDraft
+      .map((row, i) => ({ ...row, sort_order: i }))
+      .filter((row) => row.label.trim() && row.url.trim());
+    save.mutate({ links: cleanedLinks, talents: cleanedTalents });
   };
 
   if (isLoading) return <p>Loading menu links…</p>;
@@ -211,6 +247,74 @@ export default function Menu() {
             className='mt-2 rounded border border-border px-3 py-1 text-sm'
           >
             + Add custom link
+          </button>
+        </div>
+      </div>
+
+      <div className='rounded border border-border p-4'>
+        <h2 className='text-lg font-semibold'>Talents</h2>
+        <p className='text-sm text-muted'>
+          These appear in the footer "Talents" row separated by ◆ diamonds.
+        </p>
+        <div className='mt-3 space-y-2'>
+          {talentDraft.length === 0 && (
+            <p className='text-sm text-muted'>No talents yet.</p>
+          )}
+          {talentDraft.map((row, idx) => (
+            <div key={row.id} className='flex flex-wrap items-center gap-2'>
+              <input
+                aria-label='Label'
+                placeholder='Photography'
+                value={row.label}
+                onChange={(e) => updateTalent(idx, { label: e.target.value })}
+                className='rounded border border-border bg-transparent px-2 py-1 text-sm'
+              />
+              <input
+                aria-label='URL'
+                placeholder='/services?talent=photography'
+                value={row.url}
+                onChange={(e) => updateTalent(idx, { url: e.target.value })}
+                className='flex-1 min-w-[12rem] rounded border border-border bg-transparent px-2 py-1 text-sm'
+              />
+              <label className='flex items-center gap-1 text-xs'>
+                <input
+                  type='checkbox'
+                  checked={row.new_tab}
+                  onChange={(e) => updateTalent(idx, { new_tab: e.target.checked })}
+                />
+                New tab
+              </label>
+              <button
+                type='button'
+                onClick={() => moveTalent(idx, -1)}
+                className='rounded border border-border px-2 py-1 text-xs'
+                aria-label='Move up'
+              >
+                ↑
+              </button>
+              <button
+                type='button'
+                onClick={() => moveTalent(idx, 1)}
+                className='rounded border border-border px-2 py-1 text-xs'
+                aria-label='Move down'
+              >
+                ↓
+              </button>
+              <button
+                type='button'
+                onClick={() => removeTalent(idx)}
+                className='rounded border border-red-500 px-2 py-1 text-xs text-red-500'
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+          <button
+            type='button'
+            onClick={addTalent}
+            className='mt-2 rounded border border-border px-3 py-1 text-sm'
+          >
+            + Add talent
           </button>
         </div>
       </div>

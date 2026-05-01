@@ -7,6 +7,7 @@ export type {
   Intake,
   Invoice,
   MenuLink,
+  MenuData,
   SiteConfig,
   BrandAdmin,
   BrandContact,

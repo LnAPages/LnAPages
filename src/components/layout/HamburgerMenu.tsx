@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import type { MenuLink } from '@/types';
+import type { MenuData, MenuLink } from '@/types';
 import { api } from '@/lib/api';
 
 /** Inline SVG hamburger icon that morphs into an X when open.
@@ -65,12 +65,16 @@ function HamburgerIcon({ open }: { open: boolean }) {
   );
 }
 
+const DEFAULT_MENU_LINKS: MenuLink[] = [];
+
 export function HamburgerMenu() {
   const [open, setOpen] = useState(false);
-  const { data = [] } = useQuery({
+  const { data } = useQuery({
     queryKey: ['menu'],
-    queryFn: () => api.get<MenuLink[]>('/menu'),
+    queryFn: () => api.get<MenuData>('/menu'),
   });
+
+  const links = data?.links ?? DEFAULT_MENU_LINKS;
 
   return (
     <nav aria-label='Main navigation' className='relative'>
@@ -84,7 +88,7 @@ export function HamburgerMenu() {
       </button>
       {open ? (
         <div className='absolute right-0 z-20 mt-2 min-w-56 rounded-md border border-border bg-[hsl(var(--surface-2))] p-2 shadow-lg'>
-          {data.map((link) => (
+          {links.map((link) => (
             <Link
               key={link.id}
               to={link.url}

@@ -10,6 +10,8 @@ export const menuLinkSchema = z.object({
 
 export const menuSchema = z.object({
   links: z.array(menuLinkSchema),
+  talents: z.array(menuLinkSchema).default([]),
 });
 
 export type MenuLink = z.infer<typeof menuLinkSchema>;
+export type MenuData = z.infer<typeof menuSchema>;
