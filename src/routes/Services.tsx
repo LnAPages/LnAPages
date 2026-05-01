@@ -7,6 +7,21 @@ import { formatMoney } from '@/lib/utils';
 import { TalentTabs } from '@/components/TalentTab';
 import { ReadingProgress } from '@/components/fx/ReadingProgress';
 
+function EmptyState({ talentLabel }: { talentLabel?: string }) {
+  if (talentLabel) {
+    return (
+      <p className='muted'>
+        No {talentLabel.toLowerCase()} services yet —{' '}
+        <Link to='/services' className='text-[hsl(var(--accent))]'>
+          view all services
+        </Link>
+        .
+      </p>
+    );
+  }
+  return <p className='muted'>No services published yet.</p>;
+}
+
 export default function Services() {
   const [searchParams, setSearchParams] = useSearchParams();
   const talentParam = searchParams.get('talent');
@@ -49,11 +64,7 @@ export default function Services() {
         )}
 
         {data.length === 0 ? (
-          <p className='muted'>
-            {activeTalent
-              ? <>No {activeTalent.label.toLowerCase()} services yet — <Link to='/services' className='text-[hsl(var(--accent))]'>view all services</Link>.</>
-              : 'No services published yet.'}
-          </p>
+          <EmptyState talentLabel={activeTalent?.label} />
         ) : (
           <section className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
             {data.map((service) => {

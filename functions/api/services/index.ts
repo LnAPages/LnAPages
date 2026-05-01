@@ -5,7 +5,7 @@
 import { serviceCreateSchema } from '../../../shared/schemas/service';
 import { parseJson, ok, requireAdmin } from '../../lib/http';
 import { isMissingCategoryColumnError, isMissingColumnError, isMissingTableError, withDerivedServiceCategory } from '../../lib/serviceCategory';
-import { BASE_SERVICE_COLUMNS, CATEGORY_SERVICE_COLUMNS } from '../../lib/serviceColumns';
+import { BASE_SERVICE_COLUMNS, CATEGORY_SERVICE_COLUMNS, prefixColumns } from '../../lib/serviceColumns';
 import { getServicesVersion, noStoreHeaders, touchServicesVersion } from '../../lib/servicesVersion';
 import { attachTalents, setServiceTalents } from '../../lib/serviceTalents';
 import type { Env } from '../../lib/types';
@@ -32,7 +32,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     if (talentFilter) {
       // Filter by talent slug via service_talents join table
       const activeClause = includeAll ? '' : 'AND s.active = 1';
-      const sql = `SELECT ${CATEGORY_SERVICE_COLUMNS.split(',').map((c) => `s.${c.trim()}`).join(', ')}
+      const sql = `SELECT ${prefixColumns(CATEGORY_SERVICE_COLUMNS, 's')}
          FROM items s
          JOIN service_talents st ON st.service_id = s.id
          WHERE s.type IN (${SERVICE_TYPES}) ${activeClause} AND st.talent_slug = ?

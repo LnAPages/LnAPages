@@ -258,7 +258,7 @@ export default function AdminServices() {
               <div className='md:col-span-9 text-xs'>
                 <span className='block text-[hsl(var(--muted-foreground))] mb-1'>
                   Talents
-                  <span className='ml-1 text-[hsl(var(--muted-foreground)/0.7)]'>— pick one or more; determines which footer Talent link surfaces this service</span>
+                  <span className='ml-1 text-[hsl(var(--muted-foreground)/0.7)]'>— pick one or more; determines which footer talent link surfaces this service</span>
                 </span>
                 <div className='flex flex-wrap gap-1.5'>
                   {TALENTS.map((t) => {
