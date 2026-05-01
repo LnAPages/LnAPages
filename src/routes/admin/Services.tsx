@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { MenuData, Service } from '@/types';
 import { api } from '@/lib/api';
+import { ImageUpload } from '@/components/admin/ImageUpload';
 
 /** Extract the talent slug from a menu link's URL (e.g. /services?talent=injectables → injectables). */
 function extractTalentSlug(url: string): string | null {
@@ -26,6 +27,7 @@ const empty = (): Draft => ({
   active: true,
   sort_order: 0,
   talents: [],
+  image_url: null,
   _dirty: true,
 });
 
@@ -95,7 +97,7 @@ export default function AdminServices() {
         price_unit: row.price_unit || undefined,
         active: !!row.active,
         sort_order: Number(row.sort_order) || 0,
-        talents: row.talents ?? [],
+        talents: row.talents ?? [], image_url: row.image_url ?? null,
       }),
   });
 
@@ -110,7 +112,7 @@ export default function AdminServices() {
         price_unit: row.price_unit || null,
         active: !!row.active,
         sort_order: Number(row.sort_order) || 0,
-        talents: row.talents ?? [],
+        talents: row.talents ?? [], image_url: row.image_url ?? null,
       }),
   });
 
@@ -306,6 +308,7 @@ export default function AdminServices() {
                 placeholder='What the customer gets...'
               />
             </label>
+            <ImageUpload value={row.image_url ?? null} onChange={(url) => updateRow(idx, { image_url: url, _dirty: true })} folder='services' label='Image' />
 
             <div className='flex flex-wrap items-center gap-3'>
 
