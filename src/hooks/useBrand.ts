@@ -34,6 +34,7 @@ const fallbackBrandPublic: BrandPublic = {
     favicon_url: '',
     og_image_url: '',
     brand_voice: '',
+    cinemafx_trigger_phrase: '',
     updated_at: '',
   },
   contact: {
