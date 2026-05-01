@@ -10,9 +10,11 @@ export const serviceSchema = z.object({
   description: z.string().min(2),
   duration_minutes: z.number().int().positive(),
   price_cents: z.number().int().nonnegative(),
+  price_unit: z.string().optional(),
   active: z.boolean().default(true),
   sort_order: z.number().int().nonnegative().default(0),
-  category: serviceCategorySchema.optional(),
+  category: z.string().optional(),
+  talents: z.array(z.string()).optional(),
 });
 
 export const serviceCreateSchema = serviceSchema.omit({ id: true });

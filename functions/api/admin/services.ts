@@ -1,6 +1,7 @@
 import { ok, requireAdmin } from '../../lib/http';
 import { isMissingCategoryColumnError, isMissingColumnError, isMissingTableError, withDerivedServiceCategory } from '../../lib/serviceCategory';
 import { BASE_SERVICE_COLUMNS, CATEGORY_SERVICE_COLUMNS } from '../../lib/serviceColumns';
+import { attachTalents } from '../../lib/serviceTalents';
 import type { Env } from '../../lib/types';
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
@@ -45,5 +46,6 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       throw error;
     }
   }
+  results = await attachTalents(context.env, results);
   return ok(results);
 };

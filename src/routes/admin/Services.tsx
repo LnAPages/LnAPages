@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { CANONICAL_CATEGORY_SLUGS } from '@shared/constants';
+import { TALENTS } from '@/data/talents';
 import type { Service } from '@/types';
 import { api } from '@/lib/api';
 
 type Draft = Omit<Service, 'id'> & { id?: number; _dirty?: boolean; _saving?: boolean; _error?: string };
+
+const PRICE_UNITS = ['unit', 'syringe', 'session', 'area', 'drip', 'shot', 'treatment', 'vial'] as const;
 
 const empty = (): Draft => ({
   slug: '',
@@ -12,8 +14,10 @@ const empty = (): Draft => ({
   description: '',
   duration_minutes: 60,
   price_cents: 0,
+  price_unit: undefined,
   active: true,
   sort_order: 0,
+  talents: [],
   _dirty: true,
 });
 
@@ -65,8 +69,10 @@ export default function AdminServices() {
         description: row.description,
         duration_minutes: Number(row.duration_minutes) || 0,
         price_cents: Number(row.price_cents) || 0,
+        price_unit: row.price_unit || undefined,
         active: !!row.active,
         sort_order: Number(row.sort_order) || 0,
+        talents: row.talents ?? [],
       }),
   });
 
@@ -78,9 +84,10 @@ export default function AdminServices() {
         description: row.description,
         duration_minutes: Number(row.duration_minutes) || 0,
         price_cents: Number(row.price_cents) || 0,
+        price_unit: row.price_unit || null,
         active: !!row.active,
         sort_order: Number(row.sort_order) || 0,
-        category: row.category ?? null,
+        talents: row.talents ?? [],
       }),
   });
 
@@ -141,18 +148,13 @@ export default function AdminServices() {
     }
   };
 
-  const changeCategory = async (idx: number, category: (typeof CANONICAL_CATEGORY_SLUGS)[number]) => {
+  const toggleTalent = (idx: number, slug: string) => {
     const row = rows[idx];
-    updateRow(idx, { category });
-    if (!row.id) return;
-    try {
-      await updateMut.mutateAsync({ ...row, category });
-      await refetch();
-      await qc.invalidateQueries({ queryKey: ['admin', 'services'] });
-      qc.invalidateQueries({ queryKey: ['services'] });
-    } catch (e: unknown) {
-      updateRow(idx, { _error: e instanceof Error ? e.message : 'Category update failed', category: row.category });
-    }
+    const current = row.talents ?? [];
+    const next = current.includes(slug)
+      ? current.filter((s) => s !== slug)
+      : [...current, slug];
+    updateRow(idx, { talents: next });
   };
 
   if (isLoading) return <p className='p-4'>Loading services...</p>;
@@ -196,7 +198,7 @@ export default function AdminServices() {
                     const name = e.target.value;
                     updateRow(idx, { name, slug: row.slug || slugify(name) });
                   }}
-                  placeholder='Wedding package'
+                  placeholder='Botox / Dysport'
                 />
               </label>
               <label className='md:col-span-3 text-xs'>
@@ -205,7 +207,7 @@ export default function AdminServices() {
                   className='mt-1 w-full rounded border border-border bg-[hsl(var(--surface-2))] px-2 py-1 text-sm font-mono'
                   value={row.slug}
                   onChange={(e) => updateRow(idx, { slug: slugify(e.target.value) })}
-                  placeholder='wedding-package'
+                  placeholder='botox-dysport'
                 />
               </label>
               <label className='md:col-span-2 text-xs'>
@@ -237,18 +239,47 @@ export default function AdminServices() {
                   onChange={(e) => updateRow(idx, { sort_order: Number(e.target.value) })}
                 />
               </label>
+            </div>
+
+            <div className='grid grid-cols-1 gap-2 md:grid-cols-12'>
               <label className='md:col-span-3 text-xs'>
-                <span className='block text-[hsl(var(--muted-foreground))]'>Category</span>
+                <span className='block text-[hsl(var(--muted-foreground))]'>Price Unit</span>
                 <select
                   className='mt-1 w-full rounded border border-border bg-[hsl(var(--surface-2))] px-2 py-1 text-sm'
-                  value={row.category ?? CANONICAL_CATEGORY_SLUGS[0]}
-                  onChange={(e) => changeCategory(idx, e.target.value as (typeof CANONICAL_CATEGORY_SLUGS)[number])}
+                  value={row.price_unit ?? ''}
+                  onChange={(e) => updateRow(idx, { price_unit: e.target.value || undefined })}
                 >
-                  {CANONICAL_CATEGORY_SLUGS.map((value) => (
-                    <option key={value} value={value}>{value}</option>
+                  <option value=''>— none —</option>
+                  {PRICE_UNITS.map((u) => (
+                    <option key={u} value={u}>{u}</option>
                   ))}
                 </select>
               </label>
+              <div className='md:col-span-9 text-xs'>
+                <span className='block text-[hsl(var(--muted-foreground))] mb-1'>
+                  Talents
+                  <span className='ml-1 text-[hsl(var(--muted-foreground)/0.7)]'>— pick one or more; determines which footer Talent link surfaces this service</span>
+                </span>
+                <div className='flex flex-wrap gap-1.5'>
+                  {TALENTS.map((t) => {
+                    const active = (row.talents ?? []).includes(t.slug);
+                    return (
+                      <button
+                        key={t.slug}
+                        type='button'
+                        onClick={() => toggleTalent(idx, t.slug)}
+                        className={`rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors ${
+                          active
+                            ? 'bg-[hsl(var(--accent))] text-[hsl(var(--accent-foreground))]'
+                            : 'bg-[hsl(var(--surface-3))] text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--surface-2))]'
+                        }`}
+                      >
+                        {t.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
 
             <label className='block text-xs'>
