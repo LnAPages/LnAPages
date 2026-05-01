@@ -267,7 +267,7 @@ export default function Home() {
               <div className='mb-8 flex items-end justify-between gap-4'>
                 <p className='eyebrow'>selected work</p>
                 <Link to='/gallery' className='font-mono text-[13px] lowercase tracking-[0.04em] text-[hsl(var(--accent))]'>
-                  / view the gallery →
+                  view the gallery →
                 </Link>
               </div>
 
