@@ -416,10 +416,10 @@ export default function Theme() {
           <div className='card space-y-4'>
             <p className='eyebrow'>live type preview</p>
             <div className='space-y-3 rounded border border-border p-4'>
-              <p className='font-display text-4xl'>Final Stage Display</p>
-              <p className='font-serif text-2xl'>Cinematic serif rhythm for longform copy.</p>
-              <p className='font-sans text-base'>System and body voice across forms, menus, and controls.</p>
-              <p className='font-mono text-[13px] lowercase tracking-[0.04em]'>/ jetbrains mono for eyebrows, captions, marquee</p>
+              <p className='font-display text-4xl'>Display Heading</p>
+              <p className='font-serif text-2xl'>Serif rhythm for editorial and longform copy.</p>
+              <p className='font-sans text-base'>Body and UI voice across forms, menus, and controls.</p>
+              <p className='font-mono text-[13px] lowercase tracking-[0.04em]'>/ mono for eyebrows, captions, and labels</p>
             </div>
           </div>
         </div>
@@ -536,7 +536,7 @@ export default function Theme() {
             <p className='eyebrow'>sample card</p>
             <article className='card card-interactive space-y-3'>
               <p className='eyebrow'>sample card</p>
-              <h3 className='text-2xl'>final stage visual system</h3>
+              <h3 className='text-2xl'>your visual system</h3>
               <p className='muted'>Live card treatment updates with your selected variant, elevation, lift, and accents.</p>
               <button type='button' className='btn-ghost w-fit'>inspect style →</button>
             </article>
@@ -625,7 +625,7 @@ export default function Theme() {
 
           {/* Preset groups */}
           {[
-          { label: 'medical / aesthetic spa', ids: ['lift-align-medspa', 'warm-plum'] },
+          { label: 'medical / aesthetic spa', ids: ['lift-align-medspa', 'warm-plum', 'coastal-teal'] },
                     { label: 'editorial / cinematic', ids: ['final-stage-gold', 'obsidian-cyan', 'porcelain-ink', 'plum-neon', 'brass-studio'] },
             { label: 'cinema FX', ids: ['cinema-noir', 'vr-glitch-pop', 'holo-future'] },
             { label: 'cutesy / creative', ids: ['kawaii-soft', 'paper-scrapbook', 'risograph-zine', 'retro-arcade', 'dreamcore-y2k'] },
