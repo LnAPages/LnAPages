@@ -31,7 +31,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
           const file = form.get('file');
           const f = form.get('folder');
           if (typeof f === 'string' && /^[a-z0-9_-]+$/i.test(f)) folder = f;
-          if (!(file instanceof File)) return fail(400, 'NO_FILE', 'No file provided');
+          if (!file || typeof file === 'string') return fail(400, 'NO_FILE', 'No file provided');
           type = file.type || 'application/octet-stream';
           originalName = file.name || originalName;
           if (file.size > MAX_BYTES) return fail(413, 'TOO_LARGE', 'File exceeds 10MB');
