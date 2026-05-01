@@ -155,21 +155,6 @@ export default function AdminServices() {
     }
   };
 
-  const togglePublish = async (idx: number) => {
-    const row = rows[idx];
-    const next = !row.active;
-    updateRow(idx, { active: next });
-    if (row.id) {
-      try {
-        await updateMut.mutateAsync({ ...row, active: next });
-        await refetch();
-        await qc.invalidateQueries({ queryKey: ['admin', 'services'] });
-        qc.invalidateQueries({ queryKey: ['services'] });
-      } catch (e: unknown) {
-        updateRow(idx, { _error: e instanceof Error ? e.message : 'Publish toggle failed', active: row.active });
-      }
-    }
-  };
 
   const toggleTalent = (idx: number, slug: string) => {
     const row = rows[idx];
@@ -323,16 +308,6 @@ export default function AdminServices() {
             </label>
 
             <div className='flex flex-wrap items-center gap-3'>
-              <button
-                type='button'
-                onClick={() => togglePublish(idx)}
-                className={`rounded px-2 py-1 text-xs font-medium ${
-                  row.active ? 'bg-emerald-700 text-emerald-100' : 'bg-[hsl(var(--surface-3))] text-[hsl(var(--muted-foreground))]'
-                }`}
-                title='Toggle whether this service is shown publicly'
-              >
-                {row.active ? 'Published' : 'Unpublished'}
-              </button>
 
               {row._error && <span className='text-xs text-red-400'>{row._error}</span>}
 
