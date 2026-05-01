@@ -625,7 +625,8 @@ export default function Theme() {
 
           {/* Preset groups */}
           {[
-            { label: 'editorial / cinematic', ids: ['final-stage-gold', 'obsidian-cyan', 'porcelain-ink', 'plum-neon', 'brass-studio'] },
+          { label: 'medical / aesthetic spa', ids: ['lift-align-medspa', 'warm-plum'] },
+                    { label: 'editorial / cinematic', ids: ['final-stage-gold', 'obsidian-cyan', 'porcelain-ink', 'plum-neon', 'brass-studio'] },
             { label: 'cinema FX', ids: ['cinema-noir', 'vr-glitch-pop', 'holo-future'] },
             { label: 'cutesy / creative', ids: ['kawaii-soft', 'paper-scrapbook', 'risograph-zine', 'retro-arcade', 'dreamcore-y2k'] },
           ].map((group) => (
