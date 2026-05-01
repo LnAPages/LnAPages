@@ -12,6 +12,9 @@ const createSchema = z.object({
   incurred_on: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   payment_method: z.string().max(100).optional(),
   notes: z.string().max(2000).optional(),
+  is_recurring: z.number().int().min(0).max(1).optional(),
+  recurring_interval_days: z.number().int().min(1).optional(),
+  next_occurrence_at: z.string().optional(),
 });
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
@@ -57,8 +60,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
   const result = await env.LNAPAGES_DB
     .prepare(
-      `INSERT INTO expenses (category_id, vendor, description, amount_cents, currency, incurred_on, payment_method, notes, created_by, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+      `INSERT INTO expenses (category_id, vendor, description, amount_cents, currency, incurred_on, payment_method, notes, is_recurring, recurring_interval_days, next_occurrence_at, created_by, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
     )
     .bind(
       body.category_id ?? null,
@@ -69,6 +72,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       body.incurred_on,
       body.payment_method ?? null,
       body.notes ?? null,
+      body.is_recurring ?? 0,
+      body.is_recurring ? (body.recurring_interval_days ?? 31) : null,
+      body.is_recurring ? (body.next_occurrence_at ?? null) : null,
       user.id,
     )
     .run();

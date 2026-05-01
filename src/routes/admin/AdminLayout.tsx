@@ -10,7 +10,7 @@ export default function AdminLayout() {
   return (
     <section className='grid gap-4 md:grid-cols-[16rem_1fr]'>
       <Sidebar />
-      <div>
+      <div className='min-w-0'>
         <Outlet />
       </div>
     </section>

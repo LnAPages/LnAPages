@@ -357,7 +357,7 @@ export default function Pipeline() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 max-w-full">
       <header className="flex flex-wrap items-center gap-3">
         <h1 className="text-xl font-semibold">Pipeline</h1>
         <div className="flex-1 min-w-[200px]">
@@ -378,7 +378,7 @@ export default function Pipeline() {
         <p className="text-sm text-red-500">Failed to load pipeline.</p>
       ) : (
         <div
-          className="flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory md:snap-none"
+          className="flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory md:snap-none md:flex-wrap md:overflow-x-visible"
           aria-label="Pipeline columns"
           role="list"
         >
@@ -398,7 +398,7 @@ export default function Pipeline() {
                 onDragOver={(e) => handleDragOver(e, s.key)}
                 onDragLeave={() => setDragOver((d) => (d === s.key ? null : d))}
                 onDrop={(e) => handleDrop(e, s.key)}
-                className={`shrink-0 snap-start w-[85vw] md:w-72 rounded-lg border bg-surface/30 p-3 transition ${STAGE_ACCENT[s.key]} ${isOver ? 'ring-2 ring-accent' : ''}`}
+                className={`shrink-0 snap-start w-[85vw] md:w-64 md:shrink md:flex-1 rounded-lg border bg-surface/30 p-3 transition ${STAGE_ACCENT[s.key]} ${isOver ? 'ring-2 ring-accent' : ''}`}
               >
                 <header className="mb-3 flex items-baseline justify-between gap-2">
                   <h2 className="text-xs font-semibold uppercase tracking-wide text-foreground">{s.label}</h2>

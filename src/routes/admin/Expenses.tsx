@@ -3,6 +3,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 
+const DEFAULT_RECURRING_INTERVAL_DAYS = 31;
+
 type Category = { id: number; slug: string; name: string; color: string; sort_order: number };
 
 type Expense = {
@@ -14,6 +16,10 @@ type Expense = {
   vendor: string | null;
   incurred_on: string;
   created_at: string;
+  is_recurring?: number;
+  recurring_interval_days?: number | null;
+  next_occurrence_at?: string | null;
+  parent_expense_id?: number | null;
 };
 
 type ExpensesResponse = { expenses: Expense[]; totalCents: number; count: number };
@@ -30,6 +36,7 @@ export default function Expenses() {
   const [description, setDescription] = useState('');
   const [incurredOn, setIncurredOn] = useState(new Date().toISOString().slice(0, 10));
   const [formError, setFormError] = useState<string | null>(null);
+  const [isRecurring, setIsRecurring] = useState(false);
 
   const params = new URLSearchParams();
   if (dateFrom) params.set('from', dateFrom);
@@ -48,7 +55,7 @@ export default function Expenses() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (body: { amount_cents: number; category_id?: number; vendor?: string; description?: string; incurred_on: string }) =>
+    mutationFn: (body: { amount_cents: number; category_id?: number; vendor?: string; description?: string; incurred_on: string; is_recurring?: number; recurring_interval_days?: number; next_occurrence_at?: string }) =>
       api.post<{ id: number }>('/admin/expenses', body),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['expenses'] });
@@ -58,6 +65,7 @@ export default function Expenses() {
       setVendor('');
       setDescription('');
       setIncurredOn(new Date().toISOString().slice(0, 10));
+      setIsRecurring(false);
       setFormError(null);
     },
     onError: (err: Error) => setFormError(err.message),
@@ -73,12 +81,14 @@ export default function Expenses() {
     const dollars = parseFloat(amountDollars);
     if (isNaN(dollars) || dollars <= 0) { setFormError('Enter a valid amount'); return; }
     setFormError(null);
+    const nextOccurrence = new Date(new Date(incurredOn).getTime() + DEFAULT_RECURRING_INTERVAL_DAYS * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
     createMutation.mutate({
       amount_cents: Math.round(dollars * 100),
       category_id: categoryId ? Number(categoryId) : undefined,
       vendor: vendor.trim() || undefined,
       description: description.trim() || undefined,
       incurred_on: incurredOn,
+      ...(isRecurring ? { is_recurring: 1, recurring_interval_days: DEFAULT_RECURRING_INTERVAL_DAYS, next_occurrence_at: nextOccurrence } : {}),
     });
   }
 
@@ -156,6 +166,22 @@ export default function Expenses() {
                 className='w-full rounded border border-border bg-[hsl(var(--surface-2))] px-3 py-2 text-sm'
               />
             </div>
+            <div className='sm:col-span-2'>
+              <label className='flex items-center gap-2 cursor-pointer select-none'>
+                <input
+                  type='checkbox'
+                  checked={isRecurring}
+                  onChange={e => setIsRecurring(e.target.checked)}
+                  className='h-4 w-4 rounded border-border'
+                />
+                <span className='text-sm font-medium'>🔁 Recurring (every 31 days)</span>
+              </label>
+              {isRecurring && (
+                <p className='mt-1 text-xs text-muted-foreground'>
+                  A new expense entry will be auto-created every 31 days starting from the date above.
+                </p>
+              )}
+            </div>
           </div>
           {formError && <p className='text-sm text-red-400'>{formError}</p>}
           <div className='flex gap-2'>
@@ -206,25 +232,37 @@ export default function Expenses() {
       {isLoading && <p>Loading expenses...</p>}
 
       <div className='space-y-2'>
-        {expenses.map(exp => (
-          <div key={exp.id} className='flex flex-wrap items-center gap-3 rounded border border-border p-3'>
-            <div className='flex-1 min-w-0'>
-              <p className='text-sm font-medium'>${(exp.amount_cents / 100).toFixed(2)}{exp.category_name ? ` · ${exp.category_name}` : ''}</p>
-              <p className='text-xs text-muted-foreground'>
-                {exp.incurred_on}{exp.vendor ? ` · ${exp.vendor}` : ''}{exp.description ? ` · ${exp.description}` : ''}
-              </p>
-            </div>
-            <Button
-              type='button'
-              variant='outline'
-              size='sm'
-              onClick={() => { if (confirm('Delete this expense?')) deleteMutation.mutate(exp.id); }}
-              disabled={deleteMutation.isPending}
+        {expenses.map(exp => {
+          const isTemplate = exp.is_recurring === 1;
+          const isChild = Boolean(exp.parent_expense_id);
+          return (
+            <div
+              key={exp.id}
+              className={`flex flex-wrap items-center gap-3 rounded border border-border p-3 ${isChild ? 'opacity-60 ml-4' : ''}`}
             >
-              Delete
-            </Button>
-          </div>
-        ))}
+              <div className='flex-1 min-w-0'>
+                <p className='text-sm font-medium'>
+                  {isTemplate && <span title='Recurring monthly template' className='mr-1'>🔁</span>}
+                  {isChild && <span title='Auto-generated recurring entry' className='mr-1 text-xs text-muted-foreground'>↳</span>}
+                  ${(exp.amount_cents / 100).toFixed(2)}{exp.category_name ? ` · ${exp.category_name}` : ''}
+                </p>
+                <p className='text-xs text-muted-foreground'>
+                  {exp.incurred_on}{exp.vendor ? ` · ${exp.vendor}` : ''}{exp.description ? ` · ${exp.description}` : ''}
+                  {isTemplate && exp.next_occurrence_at ? ` · next: ${exp.next_occurrence_at}` : ''}
+                </p>
+              </div>
+              <Button
+                type='button'
+                variant='outline'
+                size='sm'
+                onClick={() => { if (confirm('Delete this expense?')) deleteMutation.mutate(exp.id); }}
+                disabled={deleteMutation.isPending}
+              >
+                Delete
+              </Button>
+            </div>
+          );
+        })}
         {!isLoading && expenses.length === 0 && <p className='text-sm text-muted-foreground'>No expenses found.</p>}
       </div>
     </section>

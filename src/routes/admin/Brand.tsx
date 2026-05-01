@@ -38,6 +38,7 @@ const emptyBrand: BrandAdmin = {
     favicon_url: '',
     og_image_url: '',
     brand_voice: '',
+    cinemafx_trigger_phrase: '',
     updated_at: '',
   },
   contact: {
@@ -115,6 +116,7 @@ function toIdentityInput(input: BrandAdmin['identity']): BrandIdentityInput {
     favicon_url: input.favicon_url,
     og_image_url: input.og_image_url,
     brand_voice: input.brand_voice,
+    cinemafx_trigger_phrase: input.cinemafx_trigger_phrase,
   };
 }
 
@@ -420,6 +422,21 @@ export default function Brand() {
               className='w-full rounded border border-border bg-transparent px-3 py-2 text-sm'
             />
           </label>
+
+          <div className='space-y-1 rounded border border-border p-3'>
+            <label className='block space-y-1'>
+              <span className='text-sm font-medium'>CinemaFX trigger phrase</span>
+              <input
+                value={draft.identity.cinemafx_trigger_phrase}
+                onChange={(event) => setDraft((prev) => ({ ...prev, identity: { ...prev.identity, cinemafx_trigger_phrase: event.target.value } }))}
+                placeholder='To Activate CinemaFX'
+                className='w-full rounded border border-border bg-transparent px-3 py-2 text-sm'
+              />
+            </label>
+            <p className='text-xs text-muted-foreground'>
+              Wrap your phrase in double parentheses on the public site to activate. Example: <code className='font-mono'>((To Activate CinemaFX))</code>. Leave blank to use the default.
+            </p>
+          </div>
 
           <div className='grid gap-3 md:grid-cols-2'>
             {([

@@ -12,6 +12,9 @@ const updateSchema = z.object({
   incurred_on: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   payment_method: z.string().max(100).nullable().optional(),
   notes: z.string().max(2000).nullable().optional(),
+  is_recurring: z.number().int().min(0).max(1).optional(),
+  recurring_interval_days: z.number().int().min(1).nullable().optional(),
+  next_occurrence_at: z.string().nullable().optional(),
 });
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
@@ -59,6 +62,9 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
     ['incurred_on', body.incurred_on],
     ['payment_method', body.payment_method],
     ['notes', body.notes],
+    ['is_recurring', body.is_recurring],
+    ['recurring_interval_days', body.recurring_interval_days],
+    ['next_occurrence_at', body.next_occurrence_at],
   ];
   for (const [col, val] of fields) {
     if (val !== undefined) {
