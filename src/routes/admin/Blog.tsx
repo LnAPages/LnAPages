@@ -5,6 +5,7 @@ import type { BlogPost, BlogPostInput } from '@shared/schemas/blog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { ImageUpload } from '@/components/admin/ImageUpload';
 
 const SANS = { fontFamily: 'var(--font-sans, ui-sans-serif, system-ui, sans-serif)' } as const;
 const labelCls = 'block text-sm font-medium text-foreground mb-1.5';
@@ -194,13 +195,12 @@ export default function AdminBlog() {
               />
             </div>
             <div>
-              <label htmlFor='post-cover' className={labelCls}>Cover image URL</label>
-              <Input
-                id='post-cover'
-                value={draft.cover_url ?? ''}
-                placeholder='https://…'
-                onChange={(e) => setDraft((d) => ({ ...d, cover_url: e.target.value }))}
-              />
+              <ImageUpload
+              value={draft.cover_url ?? null}
+              onChange={(url) => setDraft((d) => ({ ...d, cover_url: url ?? '' }))}
+              folder='blog'
+              label='Cover image'
+            />
             </div>
           </div>
 
