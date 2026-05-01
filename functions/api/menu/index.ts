@@ -14,11 +14,11 @@ const DEFAULT_LINKS = [
 ];
 
 const DEFAULT_TALENTS = [
-  { id: 'talent-web-design', label: 'Web Design', url: '/services?talent=web-design', new_tab: false, sort_order: 0 },
-  { id: 'talent-photography', label: 'Photography', url: '/services?talent=photography', new_tab: false, sort_order: 1 },
-  { id: 'talent-videography', label: 'Videography', url: '/services?talent=videography', new_tab: false, sort_order: 2 },
-  { id: 'talent-content-promotion', label: 'Content Promotion', url: '/services?talent=content-promotion', new_tab: false, sort_order: 3 },
-  { id: 'talent-artist-packages', label: 'Artist Packages', url: '/services?talent=artist-packages', new_tab: false, sort_order: 4 },
+  { id: 'talent-injectables', label: 'Injectables', url: '/services?talent=injectables', new_tab: false, sort_order: 0 },
+  { id: 'talent-laser-light', label: 'Laser & Light', url: '/services?talent=laser-light', new_tab: false, sort_order: 1 },
+  { id: 'talent-facials', label: 'Facials', url: '/services?talent=facials', new_tab: false, sort_order: 2 },
+  { id: 'talent-skin-treatments', label: 'Skin Treatments', url: '/services?talent=skin-treatments', new_tab: false, sort_order: 3 },
+  { id: 'talent-wellness', label: 'Wellness', url: '/services?talent=wellness', new_tab: false, sort_order: 4 },
 ];
 
 export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
