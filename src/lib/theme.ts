@@ -86,7 +86,7 @@ export type ThemeConfig = {
   sectionOrder: SectionVariant[];
 };
 
-export const FINAL_STAGE_THEME: ThemeConfig = {
+export const LIFT_ALIGN_THEME: ThemeConfig = {
   version: 2,
   accent: '#C9A962',
   accentHover: '#B89856',
@@ -139,7 +139,7 @@ export const BRAND_PRESETS: BrandPreset[] = [
         label: 'Warm Plum',
         vibe_description: 'cream warmth — plum elegance, rose softness, soft serif headlines',
         theme: {
-                ...FINAL_STAGE_THEME,
+                ...LIFT_ALIGN_THEME,
                 accent: '#3A2030',
                 accentHover: '#4A2A3F',
                 accentForeground: '#FAF7F4',
@@ -181,7 +181,7 @@ export const BRAND_PRESETS: BrandPreset[] = [
         label: 'Coastal Teal',
         vibe_description: 'crisp linen warmth — navy authority, teal vitality, Playfair serif headlines',
         theme: {
-                ...FINAL_STAGE_THEME,
+                ...LIFT_ALIGN_THEME,
                 accent: '#1A2B3C',
                 accentHover: '#243447',
                 accentForeground: '#FFFFFF',
@@ -223,7 +223,7 @@ export const BRAND_PRESETS: BrandPreset[] = [
         label: 'Lift & Align Med Spa',
         vibe_description: 'deep plum rose — warm luxury, serif elegance, rose-pink accents',
         theme: {
-                ...FINAL_STAGE_THEME,
+                ...LIFT_ALIGN_THEME,
                 accent: '#C2627A',
                 accentHover: '#A8475E',
                 accentForeground: '#FFFFFF',
@@ -263,7 +263,7 @@ export const BRAND_PRESETS: BrandPreset[] = [
         label: 'Dental Ops Navy',
         vibe_description: 'deep navy teal — clinical precision, professional trust, teal accents',
         theme: {
-                ...FINAL_STAGE_THEME,
+                ...LIFT_ALIGN_THEME,
                 accent: '#2BBFBF',
                 accentHover: '#1FA0A0',
                 accentForeground: '#FFFFFF',
@@ -303,7 +303,7 @@ export const BRAND_PRESETS: BrandPreset[] = [
         label: 'Clinical White',
         vibe_description: 'clean white sapphire — light clinical look, modern, minimalist',
         theme: {
-                ...FINAL_STAGE_THEME,
+                ...LIFT_ALIGN_THEME,
                 accent: '#1A6FBF',
                 accentHover: '#1258A0',
                 accentForeground: '#FFFFFF',
@@ -338,13 +338,13 @@ export const BRAND_PRESETS: BrandPreset[] = [
                 buttonStyle: 'solid',
         },
   },
-  { id: 'final-stage-gold', label: 'Final Stage Gold', vibe_description: 'editorial gold — cinematic, editorial, architectural', theme: FINAL_STAGE_THEME },
+  { id: 'lift-align-gold', label: 'Lift & Align Gold', vibe_description: 'editorial gold — cinematic, editorial, architectural', theme: LIFT_ALIGN_THEME },
   {
     id: 'obsidian-cyan',
     label: 'Obsidian Cyan',
     vibe_description: 'deep tech — cyber precision, glass surfaces, electric focus',
     theme: {
-      ...FINAL_STAGE_THEME,
+      ...LIFT_ALIGN_THEME,
       accent: '#24D6FF',
       accentHover: '#18B5D9',
       ring: '#24D6FF',
@@ -362,7 +362,7 @@ export const BRAND_PRESETS: BrandPreset[] = [
     label: 'Porcelain Ink',
     vibe_description: 'clean editorial — crisp white, ink-black, zero noise',
     theme: {
-      ...FINAL_STAGE_THEME,
+      ...LIFT_ALIGN_THEME,
       accent: '#2A2A2A',
       accentHover: '#151515',
       accentForeground: '#F7F7F7',
@@ -388,7 +388,7 @@ export const BRAND_PRESETS: BrandPreset[] = [
     label: 'Plum Neon',
     vibe_description: 'dark glamour — deep violet, neon accents, electric energy',
     theme: {
-      ...FINAL_STAGE_THEME,
+      ...LIFT_ALIGN_THEME,
       accent: '#E84ED8',
       accentHover: '#C23FB5',
       ring: '#E84ED8',
@@ -408,7 +408,7 @@ export const BRAND_PRESETS: BrandPreset[] = [
     label: 'Brass Studio',
     vibe_description: 'warm brutalism — brass tones, thick shadows, confident craft',
     theme: {
-      ...FINAL_STAGE_THEME,
+      ...LIFT_ALIGN_THEME,
       accent: '#C68F2F',
       accentHover: '#A97623',
       ring: '#C68F2F',
@@ -432,7 +432,7 @@ export const BRAND_PRESETS: BrandPreset[] = [
     label: 'Cinema Noir',
     vibe_description: 'silver screen — high contrast monochrome, film grain, pure cinema',
     theme: {
-      ...FINAL_STAGE_THEME,
+      ...LIFT_ALIGN_THEME,
       accent: '#E8E8E8',
       accentHover: '#C4C4C4',
       accentForeground: '#0A0A0A',
@@ -460,7 +460,7 @@ export const BRAND_PRESETS: BrandPreset[] = [
     label: 'VR Glitch Pop',
     vibe_description: 'digital rave — neon cyan on void black, scanlines, glitch energy',
     theme: {
-      ...FINAL_STAGE_THEME,
+      ...LIFT_ALIGN_THEME,
       accent: '#00FFB2',
       accentHover: '#00CC8E',
       accentForeground: '#000000',
@@ -488,7 +488,7 @@ export const BRAND_PRESETS: BrandPreset[] = [
     label: 'Holo Future',
     vibe_description: 'iridescent dusk — lavender mist, holographic shimmer, soft futures',
     theme: {
-      ...FINAL_STAGE_THEME,
+      ...LIFT_ALIGN_THEME,
       accent: '#B97DF5',
       accentHover: '#9A5EDD',
       accentForeground: '#0A0A0A',
@@ -518,7 +518,7 @@ export const BRAND_PRESETS: BrandPreset[] = [
     label: 'Kawaii Soft',
     vibe_description: 'gentle + welcoming — pastel world, pillowy shapes, spring energy',
     theme: {
-      ...FINAL_STAGE_THEME,
+      ...LIFT_ALIGN_THEME,
       accent: '#FF9BB5',
       accentHover: '#FF7AA0',
       accentForeground: '#3D1A26',
@@ -553,7 +553,7 @@ export const BRAND_PRESETS: BrandPreset[] = [
     label: 'Paper Scrapbook',
     vibe_description: 'handmade + intimate — craft paper, tape corners, zine spirit',
     theme: {
-      ...FINAL_STAGE_THEME,
+      ...LIFT_ALIGN_THEME,
       accent: '#8B5E3C',
       accentHover: '#7A4F2E',
       accentForeground: '#FAF4EC',
@@ -588,7 +588,7 @@ export const BRAND_PRESETS: BrandPreset[] = [
     label: 'Risograph Zine',
     vibe_description: 'DIY print shop — two-ink limited palette, halftone, alt confidence',
     theme: {
-      ...FINAL_STAGE_THEME,
+      ...LIFT_ALIGN_THEME,
       accent: '#FF3366',
       accentHover: '#E02255',
       accentForeground: '#FFFBF0',
@@ -623,7 +623,7 @@ export const BRAND_PRESETS: BrandPreset[] = [
     label: 'Retro Arcade',
     vibe_description: 'coin-op nostalgia — neon on void black, pixel art, 8-bit confident',
     theme: {
-      ...FINAL_STAGE_THEME,
+      ...LIFT_ALIGN_THEME,
       accent: '#00FFCC',
       accentHover: '#00E6B8',
       accentForeground: '#000000',
@@ -658,7 +658,7 @@ export const BRAND_PRESETS: BrandPreset[] = [
     label: 'Dreamcore Y2K',
     vibe_description: 'early-2000s web — chrome-pink + lavender, bubble buttons, holographic',
     theme: {
-      ...FINAL_STAGE_THEME,
+      ...LIFT_ALIGN_THEME,
       accent: '#FF69C0',
       accentHover: '#E050A8',
       accentForeground: '#150026',
@@ -789,7 +789,7 @@ function asBoolean(value: unknown, fallback: boolean): boolean {
 }
 
 function sanitizeSectionOrder(value: unknown): SectionVariant[] {
-  if (!Array.isArray(value)) return [...FINAL_STAGE_THEME.sectionOrder];
+  if (!Array.isArray(value)) return [...LIFT_ALIGN_THEME.sectionOrder];
   const incoming = value.filter((v): v is SectionVariant => typeof v === 'string' && (SECTION_VARIANTS as readonly string[]).includes(v));
   const deduped = Array.from(new Set(incoming));
   for (const variant of SECTION_VARIANTS) {
@@ -799,7 +799,7 @@ function sanitizeSectionOrder(value: unknown): SectionVariant[] {
 }
 
 export function sanitizeTheme(input: unknown): ThemeConfig {
-  if (!input || typeof input !== 'object') return { ...FINAL_STAGE_THEME };
+  if (!input || typeof input !== 'object') return { ...LIFT_ALIGN_THEME };
   const theme = input as Record<string, unknown>;
 
   const color = (key: keyof Pick<ThemeConfig,
@@ -808,7 +808,7 @@ export function sanitizeTheme(input: unknown): ThemeConfig {
   >) => {
     const value = theme[key];
     if (typeof value === 'string' && isValidHex(value)) return value.toUpperCase();
-    return FINAL_STAGE_THEME[key];
+    return LIFT_ALIGN_THEME[key];
   };
 
   return {
@@ -825,28 +825,28 @@ export function sanitizeTheme(input: unknown): ThemeConfig {
     mutedForeground: color('mutedForeground'),
     ring: color('ring'),
     overlay: color('overlay'),
-    fontDisplay: asEnum(theme.fontDisplay, FONT_CHOICES, FINAL_STAGE_THEME.fontDisplay),
-    fontSerif: asEnum(theme.fontSerif, FONT_CHOICES, FINAL_STAGE_THEME.fontSerif),
-    fontSans: asEnum(theme.fontSans, FONT_CHOICES, FINAL_STAGE_THEME.fontSans),
-    fontMono: asEnum(theme.fontMono, FONT_CHOICES, FINAL_STAGE_THEME.fontMono),
-    baseSize: asEnum(theme.baseSize, BASE_SIZE_OPTIONS, FINAL_STAGE_THEME.baseSize),
-    typeScale: asEnum(theme.typeScale, SCALE_OPTIONS, FINAL_STAGE_THEME.typeScale),
-    density: asEnum(theme.density, DENSITY_OPTIONS, FINAL_STAGE_THEME.density),
-    radius: asNumber(theme.radius, FINAL_STAGE_THEME.radius, 0, 24),
-    maxContentWidth: asNumber(theme.maxContentWidth, FINAL_STAGE_THEME.maxContentWidth, 920, 1600),
-    motion: asEnum(theme.motion, MOTION_OPTIONS, FINAL_STAGE_THEME.motion),
-    fxScanlines: asNumber(theme.fxScanlines, FINAL_STAGE_THEME.fxScanlines, 0, 100),
-    fxNoise: asNumber(theme.fxNoise, FINAL_STAGE_THEME.fxNoise, 0, 100),
-    fxVignette: asNumber(theme.fxVignette, FINAL_STAGE_THEME.fxVignette, 0, 100),
-    fxGlow: asNumber(theme.fxGlow, FINAL_STAGE_THEME.fxGlow, 0, 100),
-    fxRail: asNumber(theme.fxRail, FINAL_STAGE_THEME.fxRail, 0, 100),
-    fxProgress: asNumber(theme.fxProgress, FINAL_STAGE_THEME.fxProgress, 0, 100),
-    cardVariant: asEnum(theme.cardVariant, CARD_VARIANTS, FINAL_STAGE_THEME.cardVariant),
-    cardElevation: asNumber(theme.cardElevation, FINAL_STAGE_THEME.cardElevation, 0, 100),
-    cardHoverLift: asNumber(theme.cardHoverLift, FINAL_STAGE_THEME.cardHoverLift, 0, 24),
-    cardCornerAccent: asBoolean(theme.cardCornerAccent, FINAL_STAGE_THEME.cardCornerAccent),
-    cardTilt: asBoolean(theme.cardTilt, FINAL_STAGE_THEME.cardTilt),
-    buttonStyle: asEnum(theme.buttonStyle, BUTTON_STYLE_OPTIONS, FINAL_STAGE_THEME.buttonStyle),
+    fontDisplay: asEnum(theme.fontDisplay, FONT_CHOICES, LIFT_ALIGN_THEME.fontDisplay),
+    fontSerif: asEnum(theme.fontSerif, FONT_CHOICES, LIFT_ALIGN_THEME.fontSerif),
+    fontSans: asEnum(theme.fontSans, FONT_CHOICES, LIFT_ALIGN_THEME.fontSans),
+    fontMono: asEnum(theme.fontMono, FONT_CHOICES, LIFT_ALIGN_THEME.fontMono),
+    baseSize: asEnum(theme.baseSize, BASE_SIZE_OPTIONS, LIFT_ALIGN_THEME.baseSize),
+    typeScale: asEnum(theme.typeScale, SCALE_OPTIONS, LIFT_ALIGN_THEME.typeScale),
+    density: asEnum(theme.density, DENSITY_OPTIONS, LIFT_ALIGN_THEME.density),
+    radius: asNumber(theme.radius, LIFT_ALIGN_THEME.radius, 0, 24),
+    maxContentWidth: asNumber(theme.maxContentWidth, LIFT_ALIGN_THEME.maxContentWidth, 920, 1600),
+    motion: asEnum(theme.motion, MOTION_OPTIONS, LIFT_ALIGN_THEME.motion),
+    fxScanlines: asNumber(theme.fxScanlines, LIFT_ALIGN_THEME.fxScanlines, 0, 100),
+    fxNoise: asNumber(theme.fxNoise, LIFT_ALIGN_THEME.fxNoise, 0, 100),
+    fxVignette: asNumber(theme.fxVignette, LIFT_ALIGN_THEME.fxVignette, 0, 100),
+    fxGlow: asNumber(theme.fxGlow, LIFT_ALIGN_THEME.fxGlow, 0, 100),
+    fxRail: asNumber(theme.fxRail, LIFT_ALIGN_THEME.fxRail, 0, 100),
+    fxProgress: asNumber(theme.fxProgress, LIFT_ALIGN_THEME.fxProgress, 0, 100),
+    cardVariant: asEnum(theme.cardVariant, CARD_VARIANTS, LIFT_ALIGN_THEME.cardVariant),
+    cardElevation: asNumber(theme.cardElevation, LIFT_ALIGN_THEME.cardElevation, 0, 100),
+    cardHoverLift: asNumber(theme.cardHoverLift, LIFT_ALIGN_THEME.cardHoverLift, 0, 24),
+    cardCornerAccent: asBoolean(theme.cardCornerAccent, LIFT_ALIGN_THEME.cardCornerAccent),
+    cardTilt: asBoolean(theme.cardTilt, LIFT_ALIGN_THEME.cardTilt),
+    buttonStyle: asEnum(theme.buttonStyle, BUTTON_STYLE_OPTIONS, LIFT_ALIGN_THEME.buttonStyle),
     sectionOrder: sanitizeSectionOrder(theme.sectionOrder),
   };
 }

@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { api } from '@/lib/api';
 import { applyTheme } from '@/lib/applyTheme';
-import { FINAL_STAGE_THEME, sanitizeTheme, type ThemeConfig } from '@/lib/theme';
+import { LIFT_ALIGN_THEME, sanitizeTheme, type ThemeConfig } from '@/lib/theme';
 
 type ThemeResponse = Partial<Record<string, unknown>>;
 
 export function useTheme() {
-  const [theme, setThemeState] = useState<ThemeConfig>(FINAL_STAGE_THEME);
+  const [theme, setThemeState] = useState<ThemeConfig>(LIFT_ALIGN_THEME);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -55,7 +55,7 @@ export function useTheme() {
   }, []);
 
   const resetTheme = useCallback(() => {
-    setThemeState(FINAL_STAGE_THEME);
+    setThemeState(LIFT_ALIGN_THEME);
     // no fallback theme: keep body hidden until /theme succeeds
   }, []);
 

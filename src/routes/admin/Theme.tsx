@@ -11,7 +11,7 @@ import {
   FONT_CHOICES,
   FONT_LABELS,
   SCALE_OPTIONS,
-  FINAL_STAGE_THEME,
+  LIFT_ALIGN_THEME,
   isValidHex,
   sanitizeTheme,
   type BrandPreset,
@@ -616,7 +616,7 @@ export default function Theme() {
               <PaletteExtractor
                 onApply={(colors) => {
                   if (colors.length >= 2) {
-                    patchDraft({ accent: colors[0], background: colors[1], foreground: colors[colors.length - 1] ?? FINAL_STAGE_THEME.foreground });
+                    patchDraft({ accent: colors[0], background: colors[1], foreground: colors[colors.length - 1] ?? LIFT_ALIGN_THEME.foreground });
                   }
                 }}
               />
@@ -626,7 +626,7 @@ export default function Theme() {
           {/* Preset groups */}
           {[
           { label: 'medical / aesthetic spa', ids: ['lift-align-medspa', 'warm-plum', 'coastal-teal'] },
-                    { label: 'editorial / cinematic', ids: ['final-stage-gold', 'obsidian-cyan', 'porcelain-ink', 'plum-neon', 'brass-studio'] },
+                    { label: 'editorial / cinematic', ids: ['lift-align-gold', 'obsidian-cyan', 'porcelain-ink', 'plum-neon', 'brass-studio'] },
             { label: 'cinema FX', ids: ['cinema-noir', 'vr-glitch-pop', 'holo-future'] },
             { label: 'cutesy / creative', ids: ['kawaii-soft', 'paper-scrapbook', 'risograph-zine', 'retro-arcade', 'dreamcore-y2k'] },
           ].map((group) => (
