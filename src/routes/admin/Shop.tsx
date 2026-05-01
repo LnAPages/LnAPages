@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { KeyboardEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import { ImageUpload } from '@/components/admin/ImageUpload';
 
 type Product = {
   id?: number;
@@ -11,6 +12,7 @@ type Product = {
   price_cents: number;
   kind: 'digital' | 'apparel' | '3d' | 'shipped';
   r2_key?: string | null;
+  image_url?: string | null;
   active: boolean;
 };
 
@@ -36,6 +38,7 @@ const emptyProduct: Product = {
   kind: 'digital',
   active: true,
   r2_key: '',
+  image_url: null,
 };
 
 export default function AdminShop() {
@@ -215,6 +218,7 @@ export default function AdminShop() {
           <label className='inline-flex items-center gap-2 text-xs'><input type='checkbox' checked={draft.active} onChange={(e) => setDraft((current) => ({ ...current, active: e.target.checked }))} />Active</label>
 
           <textarea className='md:col-span-2 rounded border border-border bg-[hsl(var(--surface-2))] px-2 py-1 text-sm' placeholder='Description' value={draft.description ?? ''} onChange={(e) => setDraft((current) => ({ ...current, description: e.target.value }))} />
+          <ImageUpload value={draft.image_url ?? null} onChange={(url) => setDraft((d) => ({ ...d, image_url: url ?? null }))} folder='shop' label='Image' />
 
           <div className='md:col-span-2 space-y-2'>
             <label className='block text-xs text-[hsl(var(--muted-foreground))]'>Product tags</label>
