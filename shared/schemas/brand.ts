@@ -30,6 +30,7 @@ export const brandIdentityInputSchema = z.object({
   favicon_url: z.string().trim().max(1_500).default(''),
   og_image_url: z.string().trim().max(1_500).default(''),
   brand_voice: z.string().trim().max(4_000).default(''),
+  cinemafx_trigger_phrase: z.string().trim().max(200).default(''),
 });
 
 export const brandIdentitySchema = brandIdentityInputSchema.extend({
@@ -130,6 +131,7 @@ export const brandPublicSchema = z.object({
     favicon_url: true,
     og_image_url: true,
     brand_voice: true,
+    cinemafx_trigger_phrase: true,
     updated_at: true,
   }),
   contact: brandContactSchema.pick({

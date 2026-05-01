@@ -3,6 +3,13 @@ compatibility_date = "2025-01-01"
 compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = "dist"
 
+# Recurring expenses cron: Cloudflare Pages Functions do not support scheduled
+# triggers natively. To automate recurring expense processing, create a separate
+# Cloudflare Worker that runs on a daily cron and POSTs to:
+#   POST /api/admin/expenses/process-recurring
+# with a valid admin session cookie + CSRF token. Alternatively, call the
+# endpoint manually from the admin UI.
+
 [[d1_databases]]
 binding = "LNAPAGES_DB"
 database_name = "lnapages"

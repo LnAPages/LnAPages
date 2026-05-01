@@ -73,6 +73,42 @@ const SEED_PRESETS: SeedPreset[] = [
       fontSerif: 'quicksand', fontSans: 'quicksand', fontMono: 'space-mono', fontDisplay: 'fredoka',
     }),
   },
+  {
+    id: 'dental-pro',
+    label: 'Dental Pro',
+    vibe_description: 'clean white + greenish-blue, clinical confidence, modern dental practice',
+    theme_json: JSON.stringify({
+      mode: 'light', density: 'default', baseSize: 'md', typeScale: 'editorial', radius: 'soft',
+      bg: '#f8fffe', surface: '#edfbf8', surface2: '#d6f5ef', text: '#0d2b28', textMuted: '#4a7b74',
+      accent: '#0fa89e', accentForeground: '#ffffff', border: '#b2e4de',
+      ring: '#0fa89e', overlay: '#edfbf8',
+      fontSerif: 'plus-jakarta-sans', fontSans: 'plus-jakarta-sans', fontMono: 'space-mono', fontDisplay: 'plus-jakarta-sans',
+    }),
+  },
+  {
+    id: 'medical-purple-pro',
+    label: 'Medical Purple Pro',
+    vibe_description: 'white + purple, trustworthy medical practice, calm and professional',
+    theme_json: JSON.stringify({
+      mode: 'light', density: 'default', baseSize: 'md', typeScale: 'editorial', radius: 'soft',
+      bg: '#faf8ff', surface: '#f3effd', surface2: '#e9e1fb', text: '#1a0f35', textMuted: '#5b4a8a',
+      accent: '#7c3aed', accentForeground: '#ffffff', border: '#d1c4f5',
+      ring: '#7c3aed', overlay: '#f3effd',
+      fontSerif: 'plus-jakarta-sans', fontSans: 'plus-jakarta-sans', fontMono: 'space-mono', fontDisplay: 'plus-jakarta-sans',
+    }),
+  },
+  {
+    id: 'medspa-blush-pro',
+    label: 'MedSpa Blush Pro',
+    vibe_description: 'white + rose-gold, luxury medical spa, refined and welcoming',
+    theme_json: JSON.stringify({
+      mode: 'light', density: 'spacious', baseSize: 'md', typeScale: 'comfy', radius: 'soft',
+      bg: '#fffbf9', surface: '#fdf0ec', surface2: '#fae2da', text: '#2d1a16', textMuted: '#8a5a50',
+      accent: '#c0634a', accentForeground: '#ffffff', border: '#f0c9be',
+      ring: '#c0634a', overlay: '#fdf0ec',
+      fontSerif: 'cormorant-garamond', fontSans: 'plus-jakarta-sans', fontMono: 'space-mono', fontDisplay: 'cormorant-garamond',
+    }),
+  },
 ];
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
