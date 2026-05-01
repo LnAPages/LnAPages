@@ -1,12 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { TALENTS } from '@/data/talents';
-import type { Service } from '@/types';
+import type { MenuData, Service } from '@/types';
 import { api } from '@/lib/api';
+
+/** Extract the talent slug from a menu link's URL (e.g. /services?talent=injectables → injectables). */
+function extractTalentSlug(url: string): string | null {
+  try {
+    return new URL(url, 'http://x').searchParams.get('talent');
+  } catch {
+    return null;
+  }
+}
 
 type Draft = Omit<Service, 'id'> & { id?: number; _dirty?: boolean; _saving?: boolean; _error?: string };
 
-const PRICE_UNITS = ['unit', 'syringe', 'session', 'area', 'drip', 'shot', 'treatment', 'vial'] as const;
+const PRICE_UNITS = ['area', 'drip', 'hour', 'package', 'session', 'shot', 'syringe', 'treatment', 'unit', 'vial'] as const;
 
 const empty = (): Draft => ({
   slug: '',
@@ -41,6 +49,21 @@ export default function AdminServices() {
     queryKey: ['admin', 'services'],
     queryFn: () => api.get<Service[]>('/admin/services'),
   });
+
+  const { data: menuData } = useQuery({
+    queryKey: ['menu'],
+    queryFn: () => api.get<MenuData>('/menu'),
+  });
+
+  /** Talents derived from menu.talents — the live source of truth. */
+  const menuTalents = useMemo(
+    () =>
+      (menuData?.talents ?? [])
+        .map((t) => ({ slug: extractTalentSlug(t.url), label: t.label }))
+        .filter((t): t is { slug: string; label: string } => t.slug !== null)
+        .sort((a, b) => a.slug.localeCompare(b.slug)),
+    [menuData],
+  );
 
   const [rows, setRows] = useState<Draft[]>([]);
 
@@ -260,25 +283,31 @@ export default function AdminServices() {
                   Talents
                   <span className='ml-1 text-[hsl(var(--muted-foreground)/0.7)]'>— pick one or more; determines which footer talent link surfaces this service</span>
                 </span>
-                <div className='flex flex-wrap gap-1.5'>
-                  {TALENTS.map((t) => {
-                    const active = (row.talents ?? []).includes(t.slug);
-                    return (
-                      <button
-                        key={t.slug}
-                        type='button'
-                        onClick={() => toggleTalent(idx, t.slug)}
-                        className={`rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors ${
-                          active
-                            ? 'bg-[hsl(var(--accent))] text-[hsl(var(--accent-foreground))]'
-                            : 'bg-[hsl(var(--surface-3))] text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--surface-2))]'
-                        }`}
-                      >
-                        {t.label}
-                      </button>
-                    );
-                  })}
-                </div>
+                {menuTalents.length === 0 ? (
+                  <p className='text-xs text-[hsl(var(--muted-foreground))] italic'>
+                    No talents available. Add talents in Admin → Menu first.
+                  </p>
+                ) : (
+                  <div className='flex flex-wrap gap-1.5'>
+                    {menuTalents.map((t) => {
+                      const active = (row.talents ?? []).includes(t.slug);
+                      return (
+                        <button
+                          key={t.slug}
+                          type='button'
+                          onClick={() => toggleTalent(idx, t.slug)}
+                          className={`rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors ${
+                            active
+                              ? 'bg-[hsl(var(--accent))] text-[hsl(var(--accent-foreground))]'
+                              : 'bg-[hsl(var(--surface-3))] text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--surface-2))]'
+                          }`}
+                        >
+                          {t.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
 
