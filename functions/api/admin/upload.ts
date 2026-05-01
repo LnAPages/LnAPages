@@ -28,10 +28,10 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
     if (contentType.startsWith('multipart/form-data')) {
           const form = await context.request.formData();
-          const file = form.get('file');
+          const file = form.get('file') as unknown as File | null;
           const f = form.get('folder');
           if (typeof f === 'string' && /^[a-z0-9_-]+$/i.test(f)) folder = f;
-          if (!file || typeof file === 'string') return fail(400, 'NO_FILE', 'No file provided');
+          if (!file) return fail(400, 'NO_FILE', 'No file provided');
           type = file.type || 'application/octet-stream';
           originalName = file.name || originalName;
           if (file.size > MAX_BYTES) return fail(413, 'TOO_LARGE', 'File exceeds 10MB');
