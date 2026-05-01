@@ -14,7 +14,7 @@ export const serviceSchema = z.object({
   active: z.boolean().default(true),
   sort_order: z.number().int().nonnegative().default(0),
   category: z.string().optional(),
-  talents: z.array(z.string()).optional(),
+  talents: z.array(z.string()).optional(),  image_url: z.string().nullable().optional(),
 });
 
 export const serviceCreateSchema = serviceSchema.omit({ id: true });
