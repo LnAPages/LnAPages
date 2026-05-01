@@ -109,7 +109,7 @@ h3 { font-size: clamp(1.5rem, calc(2.5vw * var(--type-scale)), 2rem); }
   align-items: center;
   gap: 0.22rem;
 }
-.eyebrow::before { content: '/'; opacity: 0.85; }
+
 
 .muted { color: hsl(var(--muted-foreground)); }
 
