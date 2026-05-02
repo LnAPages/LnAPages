@@ -94,7 +94,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
     result = await context.env.LNAPAGES_DB.prepare(
       `INSERT INTO items (type, slug, name, description, billing_mode, duration_minutes, price_cents, price_unit, deposit_cents, active, has_page, sort_order, category, image_url, created_at, updated_at)
-       VALUES ('service', ?, ?, ?, 'fixed', ?, ?, ?, 0, ?, 1, ?, ?, ?, datetime('now'), datetime('now'))`,
+       VALUES ('service', ?, ?, ?, 'one_time', ?, ?, ?, 0, ?, 1, ?, ?, ?, datetime('now'), datetime('now'))`,
     )
       .bind(
         payload.slug,
@@ -113,7 +113,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     if (!isMissingCategoryColumnError(error)) throw error;
     result = await context.env.LNAPAGES_DB.prepare(
       `INSERT INTO items (type, slug, name, description, billing_mode, duration_minutes, price_cents, deposit_cents, active, has_page, sort_order, created_at, updated_at)
-       VALUES ('service', ?, ?, ?, 'fixed', ?, ?, 0, ?, 1, ?, datetime('now'), datetime('now'))`,
+       VALUES ('service', ?, ?, ?, 'one_time', ?, ?, 0, ?, 1, ?, datetime('now'), datetime('now'))`,
     )
       .bind(
         payload.slug,
