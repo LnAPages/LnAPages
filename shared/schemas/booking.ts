@@ -31,6 +31,10 @@ export const bookingSchema = z.object({
   stripe_session_id: z.string().optional().nullable(),
   stripe_payment_intent: z.string().optional().nullable(),
   amount_cents: z.number().int().nonnegative().optional(),
+  google_event_id: z.string().optional().nullable(),
+  google_calendar_sync_status: z.enum(['pending', 'synced', 'failed']).optional().nullable(),
+  google_calendar_sync_error: z.string().optional().nullable(),
+  google_calendar_synced_at: z.string().optional().nullable(),
 });
 
 export const bookingCreateSchema = bookingSchema.omit({
