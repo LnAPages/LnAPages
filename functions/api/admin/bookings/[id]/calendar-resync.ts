@@ -6,6 +6,11 @@ import { createCalendarEvent } from '../../../../lib/googleCalendar';
 
 const idSchema = z.coerce.number().int().positive();
 
+/** Extracts a message string from an unknown error, capped at 1 000 characters. */
+function truncateError(err: unknown): string {
+  return String(err instanceof Error ? err.message : err).slice(0, 1000);
+}
+
 type BookingRow = {
   id: number;
   item_id: number;
@@ -82,7 +87,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
       return ok({ synced: true, eventId: event.id, htmlLink: event.htmlLink });
     } catch (err) {
-      const message = String(err instanceof Error ? err.message : err).slice(0, 1000);
+      const message = truncateError(err);
 
       await context.env.LNAPAGES_DB
         .prepare(

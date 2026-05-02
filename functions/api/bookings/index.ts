@@ -4,6 +4,11 @@ import { ok, fail, parseJson, requireAdmin, HttpError } from '../../lib/http';
 import type { Env } from '../../lib/types';
 import { createCalendarEvent } from '../../lib/googleCalendar';
 
+/** Extracts a message string from an unknown error, capped at 1 000 characters. */
+function truncateError(err: unknown): string {
+  return String(err instanceof Error ? err.message : err).slice(0, 1000);
+}
+
 type ItemRow = {
   id: number;
   type: 'service' | 'product';
@@ -80,23 +85,25 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
     // 3. Validate add-ons exist + are active.
     const addonIds = payload.addon_item_ids ?? [];
     let addonTotal = 0;
+    const addonNames: string[] = [];
     if (addonIds.length > 0) {
       const placeholders = addonIds.map(() => '?').join(',');
       const { results: addons } = await env.LNAPAGES_DB
-        .prepare(`SELECT id, price_cents, active FROM items WHERE id IN (${placeholders})`)
+        .prepare(`SELECT id, name, price_cents, active FROM items WHERE id IN (${placeholders})`)
         .bind(...addonIds)
-        .all<{ id: number; price_cents: number; active: number }>();
+        .all<{ id: number; name: string; price_cents: number; active: number }>();
 
-      const foundIds = new Set((addons ?? []).map((a: { id: number; price_cents: number; active: number }) => a.id));
+      const foundIds = new Set((addons ?? []).map((a: { id: number; name: string; price_cents: number; active: number }) => a.id));
       const missing = addonIds.filter((id) => !foundIds.has(id));
       if (missing.length > 0) {
         return fail(400, 'invalid_addon', `Add-on item(s) not found: ${missing.join(', ')}`);
       }
-      const inactive = (addons ?? []).filter((a: { id: number; price_cents: number; active: number }) => a.active !== 1).map((a: { id: number; price_cents: number; active: number }) => a.id);
+      const inactive = (addons ?? []).filter((a: { id: number; name: string; price_cents: number; active: number }) => a.active !== 1).map((a: { id: number; name: string; price_cents: number; active: number }) => a.id);
       if (inactive.length > 0) {
         return fail(400, 'inactive_addon', `Add-on item(s) not active: ${inactive.join(', ')}`);
       }
-      addonTotal = (addons ?? []).reduce((sum: number, a: { id: number; price_cents: number; active: number }) => sum + a.price_cents, 0);
+      addonTotal = (addons ?? []).reduce((sum: number, a: { id: number; name: string; price_cents: number; active: number }) => sum + a.price_cents, 0);
+      addonNames.push(...(addons ?? []).map((a: { id: number; name: string; price_cents: number; active: number }) => a.name));
     }
 
     // 4. Compute totals and enforce deposit policy.
@@ -112,7 +119,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
     }
 
     // 5. Insert the booking.
-    const status = 'confirmed';
+    const status = 'pending';
     const addonJson = JSON.stringify(addonIds);
 
     const result = await env.LNAPAGES_DB
@@ -145,15 +152,15 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
     //    of truth; the calendar is a downstream side-effect.
     if (env.GOOGLE_CALENDAR_ID && env.GOOGLE_SERVICE_ACCOUNT_JSON) {
       try {
-        const addonNames = addonIds.length > 0
-          ? `\nAdd-ons: ${addonIds.join(', ')}`
+        const addonLine = addonNames.length > 0
+          ? `\nAdd-ons: ${addonNames.join(', ')}`
           : '';
         const description =
           `Customer: ${payload.customer_name}` +
           `\nEmail: ${payload.customer_email}` +
           `\nPhone: ${payload.customer_phone}` +
           `\nService: ${item.name}` +
-          addonNames +
+          addonLine +
           (payload.notes ? `\nNotes: ${payload.notes}` : '');
 
         const tz = env.GOOGLE_CALENDAR_TIMEZONE ?? 'America/Los_Angeles';
@@ -188,7 +195,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
                     google_calendar_sync_error = ?
               WHERE id = ?`,
           )
-          .bind(String((err instanceof Error ? err.message : String(err))).slice(0, 1000), bookingId)
+          .bind(truncateError(err), bookingId)
           .run();
       }
     }
