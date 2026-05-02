@@ -10,7 +10,7 @@ type Product = {
   name: string;
   description?: string | null;
   price_cents: number;
-  kind: 'digital' | 'apparel' | '3d' | 'shipped';
+  kind: 'digital' | 'apparel' | '3d' | 'shipped'; fulfillment_type?: 'digital' | 'shipment' | 'pickup'; pickup_instructions?: string | null;
   r2_key?: string | null;
   image_url?: string | null;
   active: boolean;
@@ -35,7 +35,7 @@ const emptyProduct: Product = {
   name: '',
   description: '',
   price_cents: 0,
-  kind: 'digital',
+  kind: 'digital', fulfillment_type: 'pickup',
   active: true,
   r2_key: '',
   image_url: null,
@@ -205,13 +205,13 @@ export default function AdminShop() {
             Fulfillment type
             <select
               className='w-full rounded border border-border bg-[hsl(var(--surface-2))] px-2 py-1 text-sm text-[hsl(var(--foreground))]'
-              value={draft.kind}
-              onChange={(e) => setDraft((current) => ({ ...current, kind: e.target.value as Product['kind'] }))}
+              value={draft.fulfillment_type ?? 'pickup'}
+              onChange={(e) => setDraft((current) => ({ ...current, fulfillment_type: e.target.value as Product['fulfillment_type'] }))}
             >
-              <option value='digital'>digital</option>
-              <option value='apparel'>apparel</option>
-              <option value='3d'>3d</option>
-              <option value='shipped'>shipped</option>
+              <option value='pickup'>pickup at clinic</option><option value='shipment'>shipment</option><option value='digital'>digital</option>
+              
+              
+              
             </select>
           </label>
 
