@@ -18,6 +18,9 @@ export interface Env {
     APP_URL: string;
     R2_PUBLIC_BASE_URL: string;
     GOOGLE_DRIVE_API_KEY?: string;
+    GOOGLE_CALENDAR_ID?: string;
+    GOOGLE_SERVICE_ACCOUNT_JSON?: string;
+    GOOGLE_CALENDAR_TIMEZONE?: string;
     SESSION_SECRET: string;
     ADMIN_TOKEN: string;
 }

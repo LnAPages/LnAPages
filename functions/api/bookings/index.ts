@@ -2,6 +2,7 @@ import type { PagesFunction } from '@cloudflare/workers-types';
 import { bookingCreateSchema } from '../../../shared/schemas/booking';
 import { ok, fail, parseJson, requireAdmin, HttpError } from '../../lib/http';
 import type { Env } from '../../lib/types';
+import { createCalendarEvent } from '../../lib/googleCalendar';
 
 type ItemRow = {
   id: number;
@@ -111,7 +112,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
     }
 
     // 5. Insert the booking.
-    const status = 'pending';
+    const status = 'confirmed';
     const addonJson = JSON.stringify(addonIds);
 
     const result = await env.LNAPAGES_DB
@@ -137,9 +138,64 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
       )
       .run();
 
+    const bookingId = Number(result.meta.last_row_id ?? 0);
+
+    // 6. Best-effort: create a Google Calendar event.
+    //    Never drop the booking if Calendar fails — the booking is the source
+    //    of truth; the calendar is a downstream side-effect.
+    if (env.GOOGLE_CALENDAR_ID && env.GOOGLE_SERVICE_ACCOUNT_JSON) {
+      try {
+        const addonNames = addonIds.length > 0
+          ? `\nAdd-ons: ${addonIds.join(', ')}`
+          : '';
+        const description =
+          `Customer: ${payload.customer_name}` +
+          `\nEmail: ${payload.customer_email}` +
+          `\nPhone: ${payload.customer_phone}` +
+          `\nService: ${item.name}` +
+          addonNames +
+          (payload.notes ? `\nNotes: ${payload.notes}` : '');
+
+        const tz = env.GOOGLE_CALENDAR_TIMEZONE ?? 'America/Los_Angeles';
+
+        const event = await createCalendarEvent(env, {
+          summary: `${item.name} — ${payload.customer_name}`,
+          description,
+          start: { dateTime: payload.start_time, timeZone: tz },
+          end: {
+            dateTime: payload.end_time ?? payload.start_time,
+            timeZone: tz,
+          },
+          extendedProperties: { private: { bookingId: String(bookingId) } },
+        });
+
+        await env.LNAPAGES_DB
+          .prepare(
+            `UPDATE bookings
+                SET google_event_id = ?,
+                    google_calendar_sync_status = 'synced',
+                    google_calendar_synced_at = datetime('now')
+              WHERE id = ?`,
+          )
+          .bind(event.id, bookingId)
+          .run();
+      } catch (err) {
+        console.error('[bookings] calendar sync failed', { bookingId, err });
+        await env.LNAPAGES_DB
+          .prepare(
+            `UPDATE bookings
+                SET google_calendar_sync_status = 'failed',
+                    google_calendar_sync_error = ?
+              WHERE id = ?`,
+          )
+          .bind(String((err instanceof Error ? err.message : String(err))).slice(0, 1000), bookingId)
+          .run();
+      }
+    }
+
     return ok(
       {
-        id: Number(result.meta.last_row_id ?? 0),
+        id: bookingId,
         ...payload,
         status,
         amount_cents: amountCents,
