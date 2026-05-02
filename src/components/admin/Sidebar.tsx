@@ -5,7 +5,7 @@ type Link = { to: string; label: string; panel?: string; group?: string };
 
 const ALL_LINKS: Array<Link> = [
   // Operations
-  { to: '/admin', label: 'Dashboard', panel: 'dashboard', group: 'Operations' },
+  { to: '/admin/dashboard', label: 'Dashboard', panel: 'dashboard', group: 'Operations' },
   { to: '/admin/pipeline', label: 'Pipeline', panel: 'bookings', group: 'Operations' },
   { to: '/admin/contacts', label: 'Contacts', panel: 'bookings', group: 'Operations' },
   { to: '/admin/bookings', label: 'Bookings', panel: 'bookings', group: 'Operations' },
