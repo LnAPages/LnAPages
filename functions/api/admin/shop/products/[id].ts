@@ -25,7 +25,7 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
          name = COALESCE(?, name),
          description = COALESCE(?, description),
          price_cents = COALESCE(?, price_cents),
-         kind = COALESCE(?, kind), fulfillment_type = COALESCE(?, fulfillment_type), pickup_instructions = COALESCE(?, pickup_instructions),
+         kind = COALESCE(?, kind),
          r2_key = COALESCE(?, r2_key),
          active = COALESCE(?, active)
      WHERE id = ?`,
@@ -35,7 +35,7 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
       payload.name ?? null,
       payload.description ?? null,
       payload.price_cents ?? null,
-      payload.kind ?? null, payload.fulfillment_type ?? null, payload.pickup_instructions ?? null,
+      payload.kind ?? null,
       payload.r2_key ?? null,
       payload.active === undefined ? null : (payload.active ? 1 : 0),
       id,
@@ -43,7 +43,7 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
     .run();
   if (!result.meta.changes) throw new HttpError(404, 'NOT_FOUND', 'Product not found');
   const updated = await context.env.LNAPAGES_DB.prepare(
-    'SELECT id, slug, name, description, price_cents, kind, fulfillment_type, pickup_instructions, r2_key, active, created_at FROM products WHERE id = ?',
+    'SELECT id, slug, name, description, price_cents, kind, r2_key, active, created_at FROM products WHERE id = ?',
   ).bind(id).first();
   return ok(updated);
 };
