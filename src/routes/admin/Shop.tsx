@@ -268,7 +268,7 @@ export default function AdminShop() {
           <li key={product.id} className='rounded border border-border bg-[hsl(var(--surface)/0.4)] p-3 flex items-center justify-between gap-2'>
             <div>
               <p className='font-medium'>{product.name}</p>
-              <p className='text-xs text-[hsl(var(--muted-foreground))]'>{product.slug} · ${(product.price_cents / 100).toFixed(2)} · {product.kind}</p>
+              <p className='text-xs text-[hsl(var(--muted-foreground))]'>{product.slug} · ${(product.price_cents / 100).toFixed(2)} · {product.fulfillment_type ? (product.fulfillment_type === 'pickup' ? 'pickup at clinic' : product.fulfillment_type) : (product.kind === 'shipped' ? 'pickup at clinic' : product.kind)}</p>
             </div>
             <div className='flex gap-2'>
               <button
