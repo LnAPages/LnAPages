@@ -4,10 +4,12 @@ import { ok, fail, parseJson, requireAdmin, HttpError } from '../../lib/http';
 import type { Env } from '../../lib/types';
 import { createCalendarEvent } from '../../lib/googleCalendar';
 
-/** Extracts a message string from an unknown error, capped at 1 000 characters. */
+/** Extracts a message string from an unknown error, capped at 1000 characters. */
 function truncateError(err: unknown): string {
   return String(err instanceof Error ? err.message : err).slice(0, 1000);
 }
+
+type AddonRow = { id: number; name: string; price_cents: number; active: number };
 
 type ItemRow = {
   id: number;
@@ -91,19 +93,19 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
       const { results: addons } = await env.LNAPAGES_DB
         .prepare(`SELECT id, name, price_cents, active FROM items WHERE id IN (${placeholders})`)
         .bind(...addonIds)
-        .all<{ id: number; name: string; price_cents: number; active: number }>();
+        .all<AddonRow>();
 
-      const foundIds = new Set((addons ?? []).map((a: { id: number; name: string; price_cents: number; active: number }) => a.id));
+      const foundIds = new Set((addons ?? []).map((a: AddonRow) => a.id));
       const missing = addonIds.filter((id) => !foundIds.has(id));
       if (missing.length > 0) {
         return fail(400, 'invalid_addon', `Add-on item(s) not found: ${missing.join(', ')}`);
       }
-      const inactive = (addons ?? []).filter((a: { id: number; name: string; price_cents: number; active: number }) => a.active !== 1).map((a: { id: number; name: string; price_cents: number; active: number }) => a.id);
+      const inactive = (addons ?? []).filter((a: AddonRow) => a.active !== 1).map((a: AddonRow) => a.id);
       if (inactive.length > 0) {
         return fail(400, 'inactive_addon', `Add-on item(s) not active: ${inactive.join(', ')}`);
       }
-      addonTotal = (addons ?? []).reduce((sum: number, a: { id: number; name: string; price_cents: number; active: number }) => sum + a.price_cents, 0);
-      addonNames.push(...(addons ?? []).map((a: { id: number; name: string; price_cents: number; active: number }) => a.name));
+      addonTotal = (addons ?? []).reduce((sum: number, a: AddonRow) => sum + a.price_cents, 0);
+      addonNames.push(...(addons ?? []).map((a: AddonRow) => a.name));
     }
 
     // 4. Compute totals and enforce deposit policy.

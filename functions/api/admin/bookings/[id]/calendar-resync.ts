@@ -6,7 +6,7 @@ import { createCalendarEvent } from '../../../../lib/googleCalendar';
 
 const idSchema = z.coerce.number().int().positive();
 
-/** Extracts a message string from an unknown error, capped at 1 000 characters. */
+/** Extracts a message string from an unknown error, capped at 1000 characters. */
 function truncateError(err: unknown): string {
   return String(err instanceof Error ? err.message : err).slice(0, 1000);
 }

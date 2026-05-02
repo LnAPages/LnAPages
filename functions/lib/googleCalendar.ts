@@ -5,8 +5,9 @@
  * "Make changes to events".  JWT is signed with RS256 via crypto.subtle so
  * there is no `googleapis` dependency — it does not run on Workers.
  *
- * Access tokens are cached in LNAPAGES_CONFIG KV under `google:access_token`
- * with a TTL of 3 300 s (55 min) so each Worker process reuses one token.
+ * Access tokens are cached in LNAPAGES_CONFIG KV (env.LNAPAGES_CONFIG) under
+ * `google:access_token` with a TTL of 3300 s (55 min) so each Worker process
+ * reuses one token.
  */
 
 import type { Env } from './types';
