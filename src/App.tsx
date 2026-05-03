@@ -62,6 +62,7 @@ const reducedVariants = {
 
 function AnimatedRouteWrapper({ children }: { children: React.ReactNode }) {
   const location = useLocation();
+    if (location.pathname.startsWith('/admin')) return children;
   const reduced = isMotionReduced();
   const variants = reduced ? reducedVariants : pageVariants;
 
