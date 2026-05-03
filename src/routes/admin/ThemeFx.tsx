@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { FxText } from '@/lib/fxText';
 
 type FxEntry = {
   className: string;
@@ -50,6 +51,7 @@ export default function ThemeFx() {
   );
   const [copied, setCopied] = useState<string | null>(null);
   const [activeGroup, setActiveGroup] = useState<string>('all');
+    const [previewText, setPreviewText] = useState<string>('Welcome to ((Lift)) and ((Align|fx-chroma|70))');
 
   const setIntensity = (className: string, value: number) => {
     setIntensities((prev) => ({ ...prev, [className]: value }));
@@ -77,6 +79,24 @@ export default function ThemeFx() {
           .
         </p>
       </div>
+      {/* Live preview — ((double parens)) renders FX */}
+            <div className='rounded-lg border p-4 space-y-3' style={{ borderColor: 'hsl(var(--border))', background: 'hsl(var(--surface) / 0.6)' }}>
+                      <div className='flex items-center justify-between'>
+                                <span className='font-mono text-[11px] lowercase' style={{ color: 'hsl(var(--muted-foreground))' }}>/ live preview · wrap any word in ((double parens))</span>
+                                <button type='button' className='pill text-xs' onClick={() => setPreviewText('Welcome to ((Lift)) and ((Align|fx-chroma|70))')}>reset</button>
+                      </div>
+                    <input
+                                type='text'
+                                value={previewText}
+                                onChange={(e) => setPreviewText(e.target.value)}
+                                className='w-full rounded-md border px-3 py-2 font-mono text-sm'
+                                style={{ borderColor: 'hsl(var(--border))', background: 'hsl(var(--surface-2))', color: 'hsl(var(--foreground))' }}
+                                placeholder='Type ((CINEMA)) or ((Glow|fx-chroma-pulse|80))'
+                              />
+                    <div className='rounded-md p-6 text-center text-3xl font-display' style={{ background: 'hsl(var(--surface-2))', color: 'hsl(var(--accent-foreground))' }}>
+                              <FxText text={previewText} />
+                    </div>
+            </div>
 
       {/* Group filter pills */}
       <nav className='flex flex-wrap gap-2' aria-label='FX group filter'>
